@@ -37,7 +37,7 @@ class DefaultWindowClickHandler {
     while (el != null && el is! AnchorElement) {
       el = el.parent;
     }
-    ;
+
     if (el == null) return;
     assert(el is AnchorElement);
     AnchorElement anchor = el;

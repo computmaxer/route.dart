@@ -440,7 +440,7 @@ abstract class Routable {
 }
 
 /**
- * Stores a set of [UrlPattern] to [Handler] associations and provides methods
+ * Stores a set of [UrlTemplate] to [Handler] associations and provides methods
  * for calling a handler for a URL path, listening to [Window] history events,
  * and creating HTML event handlers that navigate to a URL.
  */
@@ -895,7 +895,7 @@ class Router {
    * [History.pushState], then invokes the handler associated with [url].
    *
    * On older browsers [Location.assign] is used instead with the fragment
-   * version of the UrlPattern.
+   * version of the UrlTemplate.
    */
   Future<bool> gotoUrl(String url) => route(url).then((success) {
         if (success) {

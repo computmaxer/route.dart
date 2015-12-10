@@ -3,6 +3,8 @@ library route.history_provider;
 import 'dart:async';
 import 'dart:html';
 
+import 'package:uuid/uuid.dart';
+
 import 'link_matcher.dart';
 
 abstract class HistoryProvider {
@@ -38,7 +40,7 @@ class BrowserHistory implements HistoryProvider {
     while (el != null && el is! AnchorElement) {
       el = el.parent;
     }
-    ;
+
     if (el == null) return;
     assert(el is AnchorElement);
     AnchorElement anchor = el;
@@ -60,9 +62,7 @@ class BrowserHistory implements HistoryProvider {
     } else {
       _window.history.pushState(null, title, path);
     }
-    if (title != null) {
-      (_window.document as HtmlDocument).title = title;
-    }
+    (_window.document as HtmlDocument).title = title;
   }
 
   void back() {
@@ -89,7 +89,7 @@ class HashHistory implements HistoryProvider {
     while (el != null && el is! AnchorElement) {
       el = el.parent;
     }
-    ;
+
     if (el == null) return;
     assert(el is AnchorElement);
     AnchorElement anchor = el;
@@ -125,8 +125,7 @@ class MemoryHistory implements HistoryProvider {
   List<String> _urlList;
 
   // keep track of a unique namespace for internal urls
-  final String _namespace =
-      'router${new DateTime.now().millisecondsSinceEpoch}:';
+  final String _namespace = 'router${new Uuid().v4()}:';
 
   // broadcast changes to url
   StreamController<String> _urlStreamController;
@@ -140,7 +139,7 @@ class MemoryHistory implements HistoryProvider {
 
   Stream get onChange => _urlStream;
 
-  String get path => _urlList.length > 0 ? _urlList.last : '';
+  String get path => _urlList.isNotEmpty ? _urlList.last : '';
 
   String get urlStub => _namespace;
 
@@ -150,7 +149,7 @@ class MemoryHistory implements HistoryProvider {
     while (el != null && el is! AnchorElement) {
       el = el.parent;
     }
-    ;
+
     if (el == null) return;
     assert(el is AnchorElement);
     AnchorElement anchor = el;
@@ -172,8 +171,10 @@ class MemoryHistory implements HistoryProvider {
   }
 
   void back() {
-    _urlList.removeLast();
-    _urlStreamController.add(_urlList.last);
+    if (_urlList.length > 1) {
+      _urlList.removeLast();
+      _urlStreamController.add(_urlList.last);
+    }
   }
 
   String _normalizeHash(String hash) => hash.isEmpty ? '' : hash.substring(1);
