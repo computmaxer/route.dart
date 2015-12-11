@@ -7,8 +7,8 @@
     "url": "https://github.com/angular/route.dart.git"
   },
   "devDependencies": {
-    "karma" : "~0.12.0",
-    "karma-dart" : "~0.2.6",
+    "karma": "~0.12.0",
+    "karma-dart": "~0.2.6",
     "karma-sauce-launcher": "^0.2.3",
     "karma-script-launcher": "*",
     "karma-chrome-launcher": "~0.1.3",
@@ -23,5 +23,6 @@
       "url": "https://github.com/angular/route.dart/blob/master/LICENSE"
     }
   ],
-  "dependencies": {}
+  "dependencies": {},
+  "version": "0.7.0"
 }
