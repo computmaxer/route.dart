@@ -110,12 +110,14 @@ main() {
       var router = new Router(
           useFragment: true,
           historyProvider: new HashHistory(windowImpl: mockWindow),
-          clickHandler: expectAsync((_) {}));
+          clickHandler: expectAsync((Event e) {
+        e.preventDefault();
+      }));
       router.listen(appRoot: root);
 
       // Trigger handle method in linkHandler
       anchor.dispatchEvent(new MouseEvent('click'));
-    }, skip: "TODO: expectAsync isn't working with this");
+    });
 
     test('should be called if event triggered on child of an anchor element',
         () {
@@ -128,11 +130,13 @@ main() {
       var router = new Router(
           useFragment: true,
           historyProvider: new HashHistory(windowImpl: mockWindow),
-          clickHandler: expectAsync((_) {}));
+          clickHandler: expectAsync((Event e) {
+        e.preventDefault();
+      }));
       router.listen(appRoot: root);
 
       // Trigger handle method in linkHandler
       anchorChild.dispatchEvent(new MouseEvent('click'));
-    }, skip: "TODO: expectAsync isn't working with this");
+    });
   });
 }
