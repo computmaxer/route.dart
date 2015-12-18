@@ -992,7 +992,6 @@ main() {
           useFragment: false,
           historyProvider: new BrowserHistory(windowImpl: mockWindow));
       router.root.addRoute(name: 'articles', path: '/articles');
-      when(mockWindow.document.title).thenReturn('page title');
 
       router.go('articles', {}).then(expectAsync((_) {
         var mockHistory = mockWindow.history;
@@ -1023,7 +1022,6 @@ main() {
           useFragment: false,
           historyProvider: new BrowserHistory(windowImpl: mockWindow));
       router.root.addRoute(name: 'articles', path: '/articles');
-      when(mockWindow.document.title).thenReturn('page title');
 
       var queryParams = {'foo': 'foo bar', 'bar': '%baz+aux'};
       router
@@ -1049,7 +1047,6 @@ main() {
 
     test('should work with hierarchical go', () {
       var mockWindow = new MockWindow();
-      when(mockWindow.document.title).thenReturn('page title');
       var router = new Router(
           historyProvider: new BrowserHistory(windowImpl: mockWindow));
       router.root
@@ -1093,7 +1090,6 @@ main() {
       var counters = <String, int>{'aEnter': 0, 'bEnter': 0};
 
       var mockWindow = new MockWindow();
-      when(mockWindow.document.title).thenReturn('page title');
       var router = new Router(
           historyProvider: new BrowserHistory(windowImpl: mockWindow));
       router.root
@@ -1131,7 +1127,6 @@ main() {
       var counters = <String, int>{'aEnter': 0, 'bEnter': 0};
 
       var mockWindow = new MockWindow();
-      when(mockWindow.document.title).thenReturn('page title');
       var router = new Router(
           historyProvider: new BrowserHistory(windowImpl: mockWindow));
       router.root
@@ -1179,7 +1174,6 @@ main() {
 
     test('should not change page title if the title property is not set', () {
       var mockWindow = new MockWindow();
-      when(mockWindow.document.title).thenReturn('page title');
       var router = new Router(
           useFragment: false,
           historyProvider: new BrowserHistory(windowImpl: mockWindow));
@@ -1568,10 +1562,6 @@ main() {
     group('fragment', () {
       test('should route current hash on listen', () {
         var mockWindow = new MockWindow();
-        var mockHashChangeController = new StreamController<Event>(sync: true);
-
-        when(mockWindow.onHashChange)
-            .thenReturn(mockHashChangeController.stream);
         when(mockWindow.location.hash).thenReturn('#/foo');
         var router = new Router(
             useFragment: true,
@@ -1588,7 +1578,6 @@ main() {
 
     group('pushState', () {
       testInit(mockWindow, [count = 1]) {
-        when(mockWindow.location.hash).thenReturn('');
         when(mockWindow.location.pathname).thenReturn('/hello');
         when(mockWindow.location.search).thenReturn('?foo=bar&baz=bat');
         var router = new Router(
@@ -1637,12 +1626,7 @@ main() {
         document.body.append(toRemove = anchor);
 
         var mockWindow = new MockWindow();
-        var mockHashChangeController = new StreamController<Event>(sync: true);
-
-        when(mockWindow.onHashChange)
-            .thenReturn(mockHashChangeController.stream);
         when(mockWindow.location.hash).thenReturn('#/foo');
-        when(mockWindow.location.host).thenReturn(window.location.host);
 
         var router = new Router(
             useFragment: true,
@@ -1666,12 +1650,7 @@ main() {
         document.body.append(toRemove = anchor);
 
         var mockWindow = new MockWindow();
-        var mockHashChangeController = new StreamController<Event>(sync: true);
-
-        when(mockWindow.onHashChange)
-            .thenReturn(mockHashChangeController.stream);
         when(mockWindow.location.hash).thenReturn('#/foo');
-        when(mockWindow.location.host).thenReturn(window.location.host);
 
         var router = new Router(
             useFragment: true,

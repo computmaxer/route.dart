@@ -1,7 +1,7 @@
 library route.click_handler_test;
 
 import 'dart:html';
-import 'dart:async';
+
 import 'package:test/test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:route_hierarchical/click_handler.dart';
@@ -17,17 +17,10 @@ main() {
     MockRouter router;
     MockWindow mockWindow;
     Element root;
-    StreamController onHashChangeController;
 
     setUp(() {
       router = new MockRouter();
       mockWindow = new MockWindow();
-      // TODO - consider wrapping these when statements into the mocks themselves
-      // (if they are consistent across the test suites)
-      when(mockWindow.location.host).thenReturn(window.location.host);
-      when(mockWindow.location.hash).thenReturn('');
-      onHashChangeController = new StreamController();
-      when(mockWindow.onHashChange).thenReturn(onHashChangeController.stream);
       root = new DivElement();
       document.body.append(root);
       linkHandler = new DefaultWindowClickHandler(
@@ -42,20 +35,9 @@ main() {
       root.remove();
     });
 
-    MouseEvent _createMockMouseEvent({String anchorTarget, String anchorHref}) {
-      AnchorElement anchor = new AnchorElement();
-      if (anchorHref != null) anchor.href = anchorHref;
-      if (anchorTarget != null) anchor.target = anchorTarget;
-
-      MockMouseEvent mockMouseEvent = new MockMouseEvent();
-      when(mockMouseEvent.target).thenReturn(anchor);
-      when(mockMouseEvent.path).thenReturn([anchor]);
-      return mockMouseEvent;
-    }
-
     test('should process AnchorElements which have target set', () {
       MockMouseEvent mockMouseEvent =
-          _createMockMouseEvent(anchorHref: '#test');
+          new MockMouseEvent.withAnchor(href: '#test');
       linkHandler(mockMouseEvent);
       List calls = verify(router.gotoUrl(captureAny)).captured;
       expect(calls.length, 1);
@@ -66,19 +48,19 @@ main() {
         'should process AnchorElements which has target set to _blank, _self, _top or _parent',
         () {
       MockMouseEvent mockMouseEvent =
-          _createMockMouseEvent(anchorHref: '#test', anchorTarget: '_blank');
+          new MockMouseEvent.withAnchor(href: '#test', target: '_blank');
       linkHandler(mockMouseEvent);
 
       mockMouseEvent =
-          _createMockMouseEvent(anchorHref: '#test', anchorTarget: '_self');
+          new MockMouseEvent.withAnchor(href: '#test', target: '_self');
       linkHandler(mockMouseEvent);
 
       mockMouseEvent =
-          _createMockMouseEvent(anchorHref: '#test', anchorTarget: '_top');
+          new MockMouseEvent.withAnchor(href: '#test', target: '_top');
       linkHandler(mockMouseEvent);
 
       mockMouseEvent =
-          _createMockMouseEvent(anchorHref: '#test', anchorTarget: '_parent');
+          new MockMouseEvent.withAnchor(href: '#test', target: '_parent');
       linkHandler(mockMouseEvent);
 
       // We expect 0 calls to router.gotoUrl
@@ -92,9 +74,8 @@ main() {
       anchor.href = '#test';
       anchor.append(anchorChild);
 
-      MockMouseEvent mockMouseEvent = new MockMouseEvent();
-      when(mockMouseEvent.target).thenReturn(anchorChild);
-      when(mockMouseEvent.path).thenReturn([anchorChild, anchor]);
+      MockMouseEvent mockMouseEvent =
+          new MockMouseEvent(target: anchorChild, path: [anchorChild, anchor]);
 
       linkHandler(mockMouseEvent);
       List calls = verify(router.gotoUrl(captureAny)).captured;
@@ -110,12 +91,14 @@ main() {
       var router = new Router(
           useFragment: true,
           historyProvider: new HashHistory(windowImpl: mockWindow),
-          clickHandler: expectAsync((_) {}));
+          clickHandler: expectAsync((Event e) {
+        e.preventDefault();
+      }));
       router.listen(appRoot: root);
 
       // Trigger handle method in linkHandler
       anchor.dispatchEvent(new MouseEvent('click'));
-    }, skip: "TODO: expectAsync isn't working with this");
+    });
 
     test('should be called if event triggered on child of an anchor element',
         () {
@@ -128,11 +111,13 @@ main() {
       var router = new Router(
           useFragment: true,
           historyProvider: new HashHistory(windowImpl: mockWindow),
-          clickHandler: expectAsync((_) {}));
+          clickHandler: expectAsync((Event e) {
+        e.preventDefault();
+      }));
       router.listen(appRoot: root);
 
       // Trigger handle method in linkHandler
       anchorChild.dispatchEvent(new MouseEvent('click'));
-    }, skip: "TODO: expectAsync isn't working with this");
+    });
   });
 }
