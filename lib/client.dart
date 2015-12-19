@@ -21,6 +21,7 @@ export 'url_matcher.dart';
 import 'url_template.dart';
 
 part 'route_handle.dart';
+part 'route_view.dart';
 
 final _logger = new Logger('route');
 const _PATH_SEPARATOR = '.';
@@ -458,11 +459,12 @@ class Router {
    * [History.pushState] or paths + fragments and [Location.assign]. The default
    * value is null which then determines the behavior based on
    * [History.supportsState].
+   *
+   * If [historyProvider] isn't explicitly specified, the proper provider will
+   * be selected based upon [useFragment].
+   * [useFragment] == true => HashProvider
+   * [useFragment] == false => BrowserProvider
    */
-  //TODO - useFragment and historyProvider have blurred responsibilities at the moment
-  // - useFragment == true implies HashProvider
-  // - useFragment == false implies BrowserProvider
-  // REFACTOR THIS AWAY!
   Router(
       {bool useFragment,
       HistoryProvider historyProvider,
@@ -483,7 +485,7 @@ class Router {
       RouterLinkMatcher linkMatcher,
       WindowClickHandler clickHandler})
       : root = new RouteImpl._new() {
-    useFragment = (useFragment == null) ? !History.supportsState : useFragment;
+    useFragment = useFragment ?? !History.supportsState;
     _history = historyProvider ??
         (useFragment ? new HashHistory() : new BrowserHistory());
     if (clickHandler == null) {
@@ -562,11 +564,15 @@ class Router {
     return true;
   }
 
-  List<Route> getRoutePathForUrl(String path, {Route startingFrom}) {
+  List<RouteView> getRoutePathForUrl(String path, {Route startingFrom}) {
     // get the tree path corresponding to this route
     Route baseRoute = startingFrom == null ? root : _dehandle(startingFrom);
     List<_Match> treePath = _matchingTreePath(path, baseRoute);
-    return treePath.map((matcher) => matcher.route).toList();
+    return treePath.map((matcher) {
+      return new RouteView(matcher.route,
+          parameters: matcher.urlMatch.parameters,
+          queryParameters: matcher.queryParameters);
+    }).toList();
   }
 
   /**
