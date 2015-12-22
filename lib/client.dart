@@ -15,7 +15,6 @@ import 'src/utils.dart';
 import 'history_provider.dart';
 export 'history_provider.dart';
 import 'link_matcher.dart';
-import 'click_handler.dart';
 import 'url_matcher.dart';
 export 'url_matcher.dart';
 import 'url_template.dart';
@@ -30,6 +29,13 @@ typedef void RoutePreEnterEventHandler(RoutePreEnterEvent event);
 typedef void RouteEnterEventHandler(RouteEnterEvent event);
 typedef void RoutePreLeaveEventHandler(RoutePreLeaveEvent event);
 typedef void RouteLeaveEventHandler(RouteLeaveEvent event);
+
+/**
+ * WindowClickHandler can be used as a hook into [Router] to
+ * modify behavior right after user clicks on an element, and
+ * before the URL in the browser changes.
+ */
+typedef void WindowClickHandler(Event e);
 
 /**
  * [Route] represents a node in the route tree.
@@ -469,34 +475,24 @@ class Router {
       {bool useFragment,
       HistoryProvider historyProvider,
       bool sortRoutes: true,
-      RouterLinkMatcher linkMatcher,
-      WindowClickHandler clickHandler})
+      RouterLinkMatcher linkMatcher})
       : this._init(null,
             useFragment: useFragment,
             historyProvider: historyProvider,
             sortRoutes: sortRoutes,
-            linkMatcher: linkMatcher,
-            clickHandler: clickHandler);
+            linkMatcher: linkMatcher);
 
   Router._init(Router parent,
       {bool useFragment,
       HistoryProvider historyProvider,
       this.sortRoutes,
-      RouterLinkMatcher linkMatcher,
-      WindowClickHandler clickHandler})
+      RouterLinkMatcher linkMatcher})
       : root = new RouteImpl._new() {
     useFragment = useFragment ?? !History.supportsState;
     _history = historyProvider ??
         (useFragment ? new HashHistory() : new BrowserHistory());
-    if (clickHandler == null) {
-      if (linkMatcher == null) {
-        linkMatcher = new DefaultRouterLinkMatcher();
-      }
-      _clickHandler =
-          (e) => _history.clickHandler(e, linkMatcher, this.gotoUrl);
-    } else {
-      _clickHandler = clickHandler;
-    }
+    linkMatcher ??= new DefaultRouterLinkMatcher();
+    _clickHandler = (e) => _history.clickHandler(e, linkMatcher, this.gotoUrl);
   }
 
   /**
