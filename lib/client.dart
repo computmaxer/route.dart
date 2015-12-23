@@ -935,6 +935,4 @@ class _Match {
   final Map queryParameters;
 
   _Match(this.route, this.urlMatch, this.queryParameters);
-
-  String toString() => route.toString();
 }

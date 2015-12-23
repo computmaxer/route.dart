@@ -30,6 +30,21 @@ commonProviderTests(RouterFactory routerFactory) {
     return router.route('/foo');
   });
 
+  group('error states', () {
+    test('go method should throw if supplied an invalid route', () {
+      expect(() => router.go('foo', {}), throwsStateError);
+    });
+
+    test('url method should throw if supplied an invalid route', () {
+      expect(() => router.url('foo'), throwsStateError);
+    });
+
+    test('listen method should throw if executed more than once', () {
+      router.listen(ignoreClick: true);
+      expect(() => router.listen(ignoreClick: true), throwsStateError);
+    });
+  });
+
   group('invalid routes', () {
     test('should throw if route has no name', () {
       expect(() => router.root.addRoute(path: '/foo'), throwsArgumentError);

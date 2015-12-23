@@ -39,6 +39,13 @@ main() {
         expect(mockWindow.history.urlList.last, equals('#/articles'));
       });
 
+      test('should encode parameters in the URL', () async {
+        router.root.addRoute(name: 'foo', path: '/foo/:param');
+        await router.go('foo', {'param': 'something'});
+        expect(mockWindow.history.urlList.length, equals(1));
+        expect(mockWindow.history.urlList.last, equals('#/foo/something'));
+      });
+
       test('should encode query parameters in the URL', () async {
         router.root.addRoute(name: 'articles', path: '/articles');
 
