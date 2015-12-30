@@ -60,14 +60,6 @@ commonProviderTests(RouterFactory routerFactory) {
       expect(() => router.root.addRoute(name: 'foo', path: '/foo'),
           throwsArgumentError);
     });
-
-    test('should throw if more than one route is set as default', () {
-      router.root.addRoute(name: 'foo', path: '/foo', defaultRoute: true);
-      expect(
-          () => router.root
-              .addRoute(name: 'bar', path: '/bar', defaultRoute: true),
-          throwsStateError);
-    });
   });
 
   group('use a longer path first', () {
@@ -888,6 +880,145 @@ commonProviderTests(RouterFactory routerFactory) {
         'article_123_entered': 1,
         'article_123_view_entered': 2,
         'article_123_edit_entered': 1
+      });
+    });
+
+    test('should follow first defined default routes if multiple exist',
+        () async {
+      var counters = <String, int>{
+        'list_entered': 0,
+        'article_123_entered': 0,
+        'article_123_view_entered': 0,
+        'article_123_edit_entered': 0
+      };
+
+      router.root
+        ..addRoute(
+            name: 'articles',
+            path: '/articles',
+            defaultRoute: true,
+            enter: (_) => counters['list_entered']++)
+        ..addRoute(
+            name: 'article',
+            path: '/article/123',
+            defaultRoute: true,
+            enter: (_) => counters['article_123_entered']++,
+            mount: (Route child) => child
+              ..addRoute(
+                  name: 'viewArticles',
+                  path: '/view',
+                  defaultRoute: true,
+                  enter: (_) => counters['article_123_view_entered']++)
+              ..addRoute(
+                  name: 'editArticles',
+                  path: '/edit',
+                  defaultRoute: true,
+                  enter: (_) => counters['article_123_edit_entered']++));
+
+      await router.route('');
+      expect(counters, {
+        'list_entered': 1, // default to list
+        'article_123_entered': 0,
+        'article_123_view_entered': 0,
+        'article_123_edit_entered': 0
+      });
+      await router.route('/articles');
+      expect(counters, {
+        'list_entered': 2,
+        'article_123_entered': 0,
+        'article_123_view_entered': 0,
+        'article_123_edit_entered': 0
+      });
+      await router.route('/article/123');
+      expect(counters, {
+        'list_entered': 2,
+        'article_123_entered': 1,
+        'article_123_view_entered': 1, // default to view
+        'article_123_edit_entered': 0
+      });
+      await router.route('/article/123/view');
+      expect(counters, {
+        'list_entered': 2,
+        'article_123_entered': 1,
+        'article_123_view_entered': 2,
+        'article_123_edit_entered': 0
+      });
+      await router.route('/article/123/edit');
+      expect(counters, {
+        'list_entered': 2,
+        'article_123_entered': 1,
+        'article_123_view_entered': 2,
+        'article_123_edit_entered': 1
+      });
+    });
+
+    test(
+        'should follow first defined default routes if multiple exist (with reversed defaults)',
+        () async {
+      var counters = <String, int>{
+        'list_entered': 0,
+        'article_123_entered': 0,
+        'article_123_view_entered': 0,
+        'article_123_edit_entered': 0
+      };
+
+      router.root
+        ..addRoute(
+            name: 'article',
+            path: '/article/123',
+            defaultRoute: true,
+            enter: (_) => counters['article_123_entered']++,
+            mount: (Route child) => child
+              ..addRoute(
+                  name: 'editArticles',
+                  path: '/edit',
+                  defaultRoute: true,
+                  enter: (_) => counters['article_123_edit_entered']++)
+              ..addRoute(
+                  name: 'viewArticles',
+                  path: '/view',
+                  defaultRoute: true,
+                  enter: (_) => counters['article_123_view_entered']++))
+        ..addRoute(
+            name: 'articles',
+            path: '/articles',
+            defaultRoute: true,
+            enter: (_) => counters['list_entered']++);
+
+      await router.route('');
+      expect(counters, {
+        'list_entered': 0,
+        'article_123_entered': 1, // default to article_123
+        'article_123_view_entered': 0,
+        'article_123_edit_entered': 1 // default to edit
+      });
+      await router.route('/articles');
+      expect(counters, {
+        'list_entered': 1,
+        'article_123_entered': 1,
+        'article_123_view_entered': 0,
+        'article_123_edit_entered': 1
+      });
+      await router.route('/article/123');
+      expect(counters, {
+        'list_entered': 1,
+        'article_123_entered': 2,
+        'article_123_view_entered': 0,
+        'article_123_edit_entered': 2 // default to edit
+      });
+      await router.route('/article/123/view');
+      expect(counters, {
+        'list_entered': 1,
+        'article_123_entered': 2,
+        'article_123_view_entered': 1,
+        'article_123_edit_entered': 2
+      });
+      await router.route('/article/123/edit');
+      expect(counters, {
+        'list_entered': 1,
+        'article_123_entered': 2,
+        'article_123_view_entered': 1,
+        'article_123_edit_entered': 3
       });
     });
   });
