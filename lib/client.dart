@@ -262,9 +262,14 @@ class RouteImpl extends Route {
 
     if (defaultRoute) {
       if (_defaultRoute != null) {
-        throw new StateError('Only one default route can be added.');
+        _logger.warning(
+            'Only one default route is supported at each level of the route'
+            ' hierarchy. ${_defaultRoute.name} has already been specified'
+            ' as the default for this level, so $name will not serve as the'
+            ' default.');
+      } else {
+        _defaultRoute = route;
       }
-      _defaultRoute = route;
     }
     _routes[name] = route;
   }
