@@ -97,7 +97,6 @@ class RouteHandle implements Route {
 
   Route _getHost(Route r) {
     _assertState();
-    if (r == null) throw new StateError('Oops?!');
     if ((r is Route) && (r is! RouteHandle)) return r;
     RouteHandle rh = r;
     return rh._getHost(rh._route);

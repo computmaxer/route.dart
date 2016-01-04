@@ -15,12 +15,12 @@ import 'src/utils.dart';
 import 'history_provider.dart';
 export 'history_provider.dart';
 import 'link_matcher.dart';
-import 'click_handler.dart';
 import 'url_matcher.dart';
 export 'url_matcher.dart';
 import 'url_template.dart';
 
 part 'route_handle.dart';
+part 'route_view.dart';
 
 final _logger = new Logger('route');
 const _PATH_SEPARATOR = '.';
@@ -29,6 +29,13 @@ typedef void RoutePreEnterEventHandler(RoutePreEnterEvent event);
 typedef void RouteEnterEventHandler(RouteEnterEvent event);
 typedef void RoutePreLeaveEventHandler(RoutePreLeaveEvent event);
 typedef void RouteLeaveEventHandler(RouteLeaveEvent event);
+
+/**
+ * WindowClickHandler can be used as a hook into [Router] to
+ * modify behavior right after user clicks on an element, and
+ * before the URL in the browser changes.
+ */
+typedef void WindowClickHandler(Event e);
 
 /**
  * [Route] represents a node in the route tree.
@@ -458,43 +465,34 @@ class Router {
    * [History.pushState] or paths + fragments and [Location.assign]. The default
    * value is null which then determines the behavior based on
    * [History.supportsState].
+   *
+   * If [historyProvider] isn't explicitly specified, the proper provider will
+   * be selected based upon [useFragment].
+   * [useFragment] == true => HashProvider
+   * [useFragment] == false => BrowserProvider
    */
-  //TODO - useFragment and historyProvider have blurred responsibilities at the moment
-  // - useFragment == true implies HashProvider
-  // - useFragment == false implies BrowserProvider
-  // REFACTOR THIS AWAY!
   Router(
       {bool useFragment,
       HistoryProvider historyProvider,
       bool sortRoutes: true,
-      RouterLinkMatcher linkMatcher,
-      WindowClickHandler clickHandler})
+      RouterLinkMatcher linkMatcher})
       : this._init(null,
             useFragment: useFragment,
             historyProvider: historyProvider,
             sortRoutes: sortRoutes,
-            linkMatcher: linkMatcher,
-            clickHandler: clickHandler);
+            linkMatcher: linkMatcher);
 
   Router._init(Router parent,
       {bool useFragment,
       HistoryProvider historyProvider,
       this.sortRoutes,
-      RouterLinkMatcher linkMatcher,
-      WindowClickHandler clickHandler})
+      RouterLinkMatcher linkMatcher})
       : root = new RouteImpl._new() {
-    useFragment = (useFragment == null) ? !History.supportsState : useFragment;
+    useFragment = useFragment ?? !History.supportsState;
     _history = historyProvider ??
         (useFragment ? new HashHistory() : new BrowserHistory());
-    if (clickHandler == null) {
-      if (linkMatcher == null) {
-        linkMatcher = new DefaultRouterLinkMatcher();
-      }
-      _clickHandler =
-          (e) => _history.clickHandler(e, linkMatcher, this.gotoUrl);
-    } else {
-      _clickHandler = clickHandler;
-    }
+    linkMatcher ??= new DefaultRouterLinkMatcher();
+    _clickHandler = (e) => _history.clickHandler(e, linkMatcher, this.gotoUrl);
   }
 
   /**
@@ -562,11 +560,15 @@ class Router {
     return true;
   }
 
-  List<Route> getRoutePathForUrl(String path, {Route startingFrom}) {
+  List<RouteView> getRoutePathForUrl(String path, {Route startingFrom}) {
     // get the tree path corresponding to this route
     Route baseRoute = startingFrom == null ? root : _dehandle(startingFrom);
     List<_Match> treePath = _matchingTreePath(path, baseRoute);
-    return treePath.map((matcher) => matcher.route).toList();
+    return treePath.map((matcher) {
+      return new RouteView(matcher.route,
+          parameters: matcher.urlMatch.parameters,
+          queryParameters: matcher.queryParameters);
+    }).toList();
   }
 
   /**
@@ -933,6 +935,4 @@ class _Match {
   final Map queryParameters;
 
   _Match(this.route, this.urlMatch, this.queryParameters);
-
-  String toString() => route.toString();
 }
