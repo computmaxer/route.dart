@@ -2,6 +2,7 @@ part of route.history_provider;
 
 class BrowserHistory implements HistoryProvider {
   Window _window;
+  String _pageTitle;
 
   BrowserHistory({Window windowImpl}) {
     _window = windowImpl ?? window;
@@ -13,6 +14,16 @@ class BrowserHistory implements HistoryProvider {
       '${_window.location.hash}';
 
   String get urlStub => '';
+
+  String get pageTitle =>
+      _pageTitle ?? (_window.document as HtmlDocument).title;
+
+  void set pageTitle(String title) {
+    if (title != null) {
+      _pageTitle = title;
+      (_window.document as HtmlDocument).title = _pageTitle;
+    }
+  }
 
   void clickHandler(Event e, RouterLinkMatcher linkMatcher,
       Future<bool> gotoUrl(String url)) {
@@ -33,16 +44,12 @@ class BrowserHistory implements HistoryProvider {
     }
   }
 
-  void go(String path, String title, bool replace) {
-    if (title == null) {
-      title = (_window.document as HtmlDocument).title;
-    }
+  void go(String path, bool replace) {
     if (replace) {
-      _window.history.replaceState(null, title, path);
+      _window.history.replaceState(null, pageTitle, path);
     } else {
-      _window.history.pushState(null, title, path);
+      _window.history.pushState(null, pageTitle, path);
     }
-    (_window.document as HtmlDocument).title = title;
   }
 
   void back() {
