@@ -23,6 +23,8 @@ class MemoryHistory implements HistoryProvider {
 
   String get urlStub => _namespace;
 
+  String pageTitle = '';
+
   void clickHandler(Event e, RouterLinkMatcher linkMatcher,
       Future<bool> gotoUrl(String url)) {
     Element el = e.target;
@@ -42,7 +44,7 @@ class MemoryHistory implements HistoryProvider {
     }
   }
 
-  void go(String path, String title, bool replace) {
+  void go(String path, bool replace) {
     if (replace) {
       _urlList.removeLast();
     }

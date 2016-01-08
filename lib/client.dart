@@ -537,7 +537,14 @@ class Router {
     var treePath = _matchingTreePath(path, baseRoute);
     // Figure out the list of routes that will be leaved
     var future =
-        _preLeave(path, treePath, trimmedActivePath, baseRoute, forceReload);
+        _preLeave(path, treePath, trimmedActivePath, baseRoute, forceReload)
+            .then((success) {
+      // if the route change was successful, change the pageTitle
+      if ((success) && (treePath.isNotEmpty)) {
+        _history.pageTitle = treePath.last.route.pageTitle;
+      }
+      return success;
+    });
     _onRouteStart.add(new RouteStartEvent._new(path, future));
     return future;
   }
@@ -781,7 +788,7 @@ class Router {
     return route(newTail, startingFrom: baseRoute, forceReload: forceReload)
         .then((success) {
       if (success) {
-        _go(newUrl, routeToGo.pageTitle, replace);
+        _go(newUrl, replace);
       }
       return success;
     });
@@ -906,12 +913,13 @@ class Router {
    */
   Future<bool> gotoUrl(String url) => route(url).then((success) {
         if (success) {
-          _go(url, null, false);
+          _go(url, false);
         }
+        return success;
       });
 
-  void _go(String path, String title, bool replace) {
-    _history.go(path, title, replace);
+  void _go(String path, bool replace) {
+    _history.go(path, replace);
   }
 
   /**

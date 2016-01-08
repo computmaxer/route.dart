@@ -308,7 +308,18 @@ main() {
       });
 
       group('links', () {
+        MockWindow mockWindow;
+        HistoryProvider history;
+        Router router;
         Element toRemove;
+
+        setUp(() {
+          mockWindow = new MockWindow();
+          history = new HashHistory(windowImpl: mockWindow);
+          when(mockWindow.location.hash).thenReturn('#/foo');
+          router = new Router(historyProvider: history);
+          router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
+        });
 
         tearDown(() {
           if (toRemove != null) {
@@ -317,46 +328,43 @@ main() {
           }
         });
 
-        test('it should be called if event triggered on anchor element', () {
+        test('it should be called if event triggered on anchor element',
+            () async {
           AnchorElement anchor = new AnchorElement();
-          anchor.href = '#test1';
+          anchor.href = '#foo';
           document.body.append(toRemove = anchor);
 
-          var mockWindow = new MockWindow();
-          when(mockWindow.location.hash).thenReturn('#/foo');
-
-          var router = new Router(
-              historyProvider: new HashHistory(windowImpl: mockWindow));
           router.listen(appRoot: anchor);
 
-          router.onRouteStart.listen(expectAsync((RouteStartEvent e) {
-            expect(e.uri, 'test1');
-          }, max: 2));
+          expect(history.pageTitle, equals('page title'));
+          expect(router.findRoute('foo').isActive, isFalse);
 
           anchor.click();
+
+          await new Future.delayed(Duration.ZERO);
+          expect(history.pageTitle, equals('Foo'));
+          expect(router.findRoute('foo').isActive, isTrue);
         });
 
         test(
             'it should be called if event triggered on child of an anchor element',
-            () {
+            () async {
           Element anchorChild = new DivElement();
           AnchorElement anchor = new AnchorElement();
-          anchor.href = '#test2';
+          anchor.href = '#foo';
           anchor.append(anchorChild);
           document.body.append(toRemove = anchor);
 
-          var mockWindow = new MockWindow();
-          when(mockWindow.location.hash).thenReturn('#/foo');
-
-          var router = new Router(
-              historyProvider: new HashHistory(windowImpl: mockWindow));
           router.listen(appRoot: anchor);
 
-          router.onRouteStart.listen(expectAsync((RouteStartEvent e) {
-            expect(e.uri, 'test2');
-          }, max: 2));
+          expect(history.pageTitle, equals('page title'));
+          expect(router.findRoute('foo').isActive, isFalse);
 
           anchorChild.click();
+
+          await new Future.delayed(Duration.ZERO);
+          expect(history.pageTitle, equals('Foo'));
+          expect(router.findRoute('foo').isActive, isTrue);
         });
       });
     });

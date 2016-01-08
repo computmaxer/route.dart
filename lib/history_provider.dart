@@ -15,9 +15,10 @@ abstract class HistoryProvider {
   Stream get onChange;
   String get path;
   String get urlStub;
+  String pageTitle;
 
   void clickHandler(
       Event e, RouterLinkMatcher linkMatcher, Future<bool> gotoUrl(String url));
-  void go(String path, String title, bool replace);
+  void go(String path, bool replace);
   void back();
 }
