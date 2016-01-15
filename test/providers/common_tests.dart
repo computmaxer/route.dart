@@ -21,12 +21,14 @@ commonProviderTests(RouterFactory routerFactory) {
   });
 
   test('paths are routed to routes added with addRoute', () {
-    router.root.addRoute(name: 'foo', path: '/foo',
+    router.root.addRoute(
+        name: 'foo',
+        path: '/foo',
         enter: expectAsync((RouteEvent e) {
-      expect(e.path, '/foo');
-      expect(router.root.findRoute('foo').isActive, isTrue);
-      expect(router.isUrlActive('/foo'), isTrue);
-    }));
+          expect(e.path, '/foo');
+          expect(router.root.findRoute('foo').isActive, isTrue);
+          expect(router.isUrlActive('/foo'), isTrue);
+        }));
     return router.route('/foo');
   });
 
@@ -65,12 +67,14 @@ commonProviderTests(RouterFactory routerFactory) {
   group('use a longer path first', () {
     test('add a longer path first', () {
       router.root
-        ..addRoute(name: 'foobar', path: '/foo/bar',
+        ..addRoute(
+            name: 'foobar',
+            path: '/foo/bar',
             enter: expectAsync((RouteEvent e) {
-          expect(e.path, '/foo/bar');
-          expect(router.root.findRoute('foobar').isActive, isTrue);
-          expect(router.isUrlActive('/foo/bar'), isTrue);
-        }))
+              expect(e.path, '/foo/bar');
+              expect(router.root.findRoute('foobar').isActive, isTrue);
+              expect(router.isUrlActive('/foo/bar'), isTrue);
+            }))
         ..addRoute(
             name: 'foo',
             path: '/foo',
@@ -84,12 +88,14 @@ commonProviderTests(RouterFactory routerFactory) {
             name: 'foo',
             path: '/foo',
             enter: (e) => fail('should invoke /foo/bar'))
-        ..addRoute(name: 'foobar', path: '/foo/bar',
+        ..addRoute(
+            name: 'foobar',
+            path: '/foo/bar',
             enter: expectAsync((RouteEvent e) {
-          expect(e.path, '/foo/bar');
-          expect(router.root.findRoute('foobar').isActive, isTrue);
-          expect(router.isUrlActive('/foo/bar'), isTrue);
-        }));
+              expect(e.path, '/foo/bar');
+              expect(router.root.findRoute('foobar').isActive, isTrue);
+              expect(router.isUrlActive('/foo/bar'), isTrue);
+            }));
       return router.route('/foo/bar');
     });
 
@@ -99,23 +105,27 @@ commonProviderTests(RouterFactory routerFactory) {
             name: 'foo',
             path: '/foo',
             enter: (e) => fail('should invoke /foo/bar'))
-        ..addRoute(name: 'fooparam', path: '/foo/:param',
+        ..addRoute(
+            name: 'fooparam',
+            path: '/foo/:param',
             enter: expectAsync((RouteEvent e) {
-          expect(e.path, '/foo/bar');
-          expect(router.root.findRoute('fooparam').isActive, isTrue);
-          expect(router.isUrlActive('/foo/bar'), isTrue);
-        }));
+              expect(e.path, '/foo/bar');
+              expect(router.root.findRoute('fooparam').isActive, isTrue);
+              expect(router.isUrlActive('/foo/bar'), isTrue);
+            }));
       return router.route('/foo/bar');
     });
 
     test('add paths with a parameterized parent', () {
       router.root
-        ..addRoute(name: 'paramaddress', path: '/:zzzzzz/address',
+        ..addRoute(
+            name: 'paramaddress',
+            path: '/:zzzzzz/address',
             enter: expectAsync((RouteEvent e) {
-          expect(e.path, '/foo/address');
-          expect(router.root.findRoute('paramaddress').isActive, isTrue);
-          expect(router.isUrlActive('/foo/address'), isTrue);
-        }))
+              expect(e.path, '/foo/address');
+              expect(router.root.findRoute('paramaddress').isActive, isTrue);
+              expect(router.isUrlActive('/foo/address'), isTrue);
+            }))
         ..addRoute(
             name: 'param_add',
             path: '/:aaaaaa/add',
@@ -125,12 +135,14 @@ commonProviderTests(RouterFactory routerFactory) {
 
     test('add paths with a first param and one without', () {
       router.root
-        ..addRoute(name: 'fooparam', path: '/:param/foo',
+        ..addRoute(
+            name: 'fooparam',
+            path: '/:param/foo',
             enter: expectAsync((RouteEvent e) {
-          expect(e.path, '/bar/foo');
-          expect(router.root.findRoute('fooparam').isActive, isTrue);
-          expect(router.isUrlActive('/bar/foo'), isTrue);
-        }))
+              expect(e.path, '/bar/foo');
+              expect(router.root.findRoute('fooparam').isActive, isTrue);
+              expect(router.isUrlActive('/bar/foo'), isTrue);
+            }))
         ..addRoute(
             name: 'bar',
             path: '/bar',
@@ -144,12 +156,14 @@ commonProviderTests(RouterFactory routerFactory) {
             name: 'paramfoo',
             path: '/:param/foo',
             enter: (e) => fail('should enter barfoo'))
-        ..addRoute(name: 'barfoo', path: '/bar/foo',
+        ..addRoute(
+            name: 'barfoo',
+            path: '/bar/foo',
             enter: expectAsync((RouteEvent e) {
-          expect(e.path, '/bar/foo');
-          expect(router.root.findRoute('barfoo').isActive, isTrue);
-          expect(router.isUrlActive('/bar/foo'), isTrue);
-        }));
+              expect(e.path, '/bar/foo');
+              expect(router.root.findRoute('barfoo').isActive, isTrue);
+              expect(router.isUrlActive('/bar/foo'), isTrue);
+            }));
       return router.route('/bar/foo');
     });
 
@@ -159,12 +173,14 @@ commonProviderTests(RouterFactory routerFactory) {
             name: 'bazparamfoo',
             path: '/baz/:param/foo',
             enter: (e) => fail('should enter bazbarfoo'))
-        ..addRoute(name: 'bazbarfoo', path: '/baz/bar/foo',
+        ..addRoute(
+            name: 'bazbarfoo',
+            path: '/baz/bar/foo',
             enter: expectAsync((RouteEvent e) {
-          expect(e.path, '/baz/bar/foo');
-          expect(router.root.findRoute('bazbarfoo').isActive, isTrue);
-          expect(router.isUrlActive('/baz/bar/foo'), isTrue);
-        }));
+              expect(e.path, '/baz/bar/foo');
+              expect(router.root.findRoute('bazbarfoo').isActive, isTrue);
+              expect(router.isUrlActive('/baz/bar/foo'), isTrue);
+            }));
       return router.route('/baz/bar/foo');
     });
 
@@ -174,12 +190,14 @@ commonProviderTests(RouterFactory routerFactory) {
             name: 'parambarfoo',
             path: '/:param/bar/foo',
             enter: (e) => fail('should enter bazparamfoo'))
-        ..addRoute(name: 'bazparamfoo', path: '/baz/:param/foo',
+        ..addRoute(
+            name: 'bazparamfoo',
+            path: '/baz/:param/foo',
             enter: expectAsync((RouteEvent e) {
-          expect(e.path, '/baz/bar/foo');
-          expect(router.root.findRoute('bazparamfoo').isActive, isTrue);
-          expect(router.isUrlActive('/baz/bar/foo'), isTrue);
-        }));
+              expect(e.path, '/baz/bar/foo');
+              expect(router.root.findRoute('bazparamfoo').isActive, isTrue);
+              expect(router.isUrlActive('/baz/bar/foo'), isTrue);
+            }));
       return router.route('/baz/bar/foo');
     });
 
@@ -189,12 +207,14 @@ commonProviderTests(RouterFactory routerFactory) {
             name: 'param1param2foo',
             path: '/:param1/:param2/foo',
             enter: (e) => fail('should enter bazparamfoo'))
-        ..addRoute(name: 'param1barfoo', path: '/:param1/bar/foo',
+        ..addRoute(
+            name: 'param1barfoo',
+            path: '/:param1/bar/foo',
             enter: expectAsync((RouteEvent e) {
-          expect(e.path, '/baz/bar/foo');
-          expect(router.root.findRoute('param1barfoo').isActive, isTrue);
-          expect(router.isUrlActive('/baz/bar/foo'), isTrue);
-        }));
+              expect(e.path, '/baz/bar/foo');
+              expect(router.root.findRoute('param1barfoo').isActive, isTrue);
+              expect(router.isUrlActive('/baz/bar/foo'), isTrue);
+            }));
       return router.route('/baz/bar/foo');
     });
   });
@@ -202,17 +222,22 @@ commonProviderTests(RouterFactory routerFactory) {
   group('hierarchical routing', () {
     void _testParentChild(Pattern parentPath, Pattern childPath,
         String expectedParentPath, String expectedChildPath, String testPath) {
-      router.root.addRoute(name: 'parent', path: parentPath,
+      router.root.addRoute(
+          name: 'parent',
+          path: parentPath,
           enter: expectAsync((RouteEvent e) {
-        expect(e.path, expectedParentPath);
-        expect(e.route, isNotNull);
-        expect(e.route.name, 'parent');
-      }), mount: (Route child) {
-        child.addRoute(name: 'child', path: childPath,
-            enter: expectAsync((RouteEvent e) {
-          expect(e.path, expectedChildPath);
-        }));
-      });
+            expect(e.path, expectedParentPath);
+            expect(e.route, isNotNull);
+            expect(e.route.name, 'parent');
+          }),
+          mount: (Route child) {
+            child.addRoute(
+                name: 'child',
+                path: childPath,
+                enter: expectAsync((RouteEvent e) {
+                  expect(e.path, expectedChildPath);
+                }));
+          });
       router.route(testPath);
     }
 
@@ -734,10 +759,13 @@ commonProviderTests(RouterFactory routerFactory) {
             preLeave: (_) => counters['fooPreLeave']++,
             enter: (_) => counters['fooEnter']++,
             leave: (_) => counters['fooLeave']++)
-        ..addRoute(path: '/bar', name: 'bar', preEnter: (RoutePreEnterEvent e) {
-          counters['barPreEnter']++;
-          e.allowEnter(new Future<bool>.value(false));
-        },
+        ..addRoute(
+            path: '/bar',
+            name: 'bar',
+            preEnter: (RoutePreEnterEvent e) {
+              counters['barPreEnter']++;
+              e.allowEnter(new Future<bool>.value(false));
+            },
             preLeave: (_) => counters['barPreLeave']++,
             enter: (_) => counters['barEnter']++,
             leave: (_) => counters['barLeave']++);
@@ -782,10 +810,13 @@ commonProviderTests(RouterFactory routerFactory) {
   group('Default route', () {
     void _testHeadTail(String path, String expectFoo, String expectBar) {
       router.root
-        ..addRoute(name: 'foo', path: '/foo', defaultRoute: true,
+        ..addRoute(
+            name: 'foo',
+            path: '/foo',
+            defaultRoute: true,
             enter: expectAsync((RouteEvent e) {
-          expect(e.path, expectFoo);
-        }),
+              expect(e.path, expectFoo);
+            }),
             mount: (child) => child
               ..addRoute(
                   name: 'bar',
@@ -1067,11 +1098,13 @@ commonProviderTests(RouterFactory routerFactory) {
     group('query params', () {
       test('should parse query', () {
         router.root
-          ..addRoute(name: 'foo', path: '/:foo',
+          ..addRoute(
+              name: 'foo',
+              path: '/:foo',
               enter: expectAsync((RouteEvent e) {
-            expect(e.parameters, {'foo': '123',});
-            expect(e.queryParameters, {'a': 'b', 'b': '', 'c': 'foo bar'});
-          }));
+                expect(e.parameters, {'foo': '123',});
+                expect(e.queryParameters, {'a': 'b', 'b': '', 'c': 'foo bar'});
+              }));
 
         router.route('/123?a=b&b=&c=foo%20bar');
       });
