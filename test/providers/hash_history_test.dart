@@ -285,12 +285,14 @@ main() {
           var router = new Router(
               historyProvider: new HashHistory(windowImpl: mockWindow));
           router.root
-            ..addRoute(name: 'foo', path: '/foo',
+            ..addRoute(
+                name: 'foo',
+                path: '/foo',
                 preEnter: (RoutePreEnterEvent e) {
-              Completer<bool> completer = new Completer();
-              completer.complete(false);
-              return e.allowEnter(completer.future);
-            })
+                  Completer<bool> completer = new Completer();
+                  completer.complete(false);
+                  return e.allowEnter(completer.future);
+                })
             ..addRoute(name: 'bar', path: '/bar');
 
           router.listen();
