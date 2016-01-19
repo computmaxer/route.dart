@@ -794,6 +794,11 @@ class Router {
     });
   }
 
+  /// Navigate to the previous url via the historyProvider's back mechanism
+  void goBack() {
+    _history.back();
+  }
+
   /// Returns an absolute URL for a given relative route path and parameters.
   String url(String routePath,
       {Route startingFrom, Map parameters, Map queryParameters}) {
