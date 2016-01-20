@@ -28,6 +28,9 @@ main() {
 
   querySelector('#R1linkOne').attributes['href'] = router.url('one');
   querySelector('#R1linkTwo').attributes['href'] = router.url('two');
+  querySelector('#R1linkBackButton').onClick.listen((e) {
+    router.goBack();
+  });
 
   router.listen();
 
@@ -47,6 +50,9 @@ main() {
 
   querySelector('#R2linkOne').attributes['href'] = router2.url('one');
   querySelector('#R2linkTwo').attributes['href'] = router2.url('two');
+  querySelector('#R2linkBackButton').onClick.listen((e) {
+    router2.goBack();
+  });
 
   router2.listen();
 }

@@ -122,6 +122,24 @@ main() {
       });
     });
 
+    group('goBack', () {
+      test('should go to the previous route', () async {
+        List<String> urlHistory = [];
+        Router router = new Router(
+            historyProvider: new MemoryHistory(urlHistory: urlHistory));
+
+        router.root.addRoute(name: 'foo', path: '/foo');
+        router.root.addRoute(name: 'bar', path: '/bar');
+
+        await router.go('foo', {});
+        await router.go('bar', {});
+        expect(urlHistory, equals(['/foo', '/bar']));
+
+        router.goBack();
+        expect(urlHistory, equals(['/foo']));
+      });
+    });
+
     group('url', () {
       test('should reconstruct url', () async {
         var router = new Router(historyProvider: new MemoryHistory());

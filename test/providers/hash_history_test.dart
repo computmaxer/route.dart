@@ -146,6 +146,24 @@ main() {
       });
     });
 
+    group('goBack', () {
+      test('should go to the previous route', () async {
+        MockWindow mockWindow = new MockWindow();
+        Router router = new Router(
+            historyProvider: new HashHistory(windowImpl: mockWindow));
+
+        router.root.addRoute(name: 'foo', path: '/foo');
+        router.root.addRoute(name: 'bar', path: '/bar');
+
+        await router.go('foo', {});
+        await router.go('bar', {});
+        expect(mockWindow.history.urlList, equals(['#/foo', '#/bar']));
+
+        router.goBack();
+        expect(mockWindow.history.urlList, equals(['#/foo']));
+      });
+    });
+
     group('url', () {
       test('should reconstruct url', () async {
         var mockWindow = new MockWindow();
