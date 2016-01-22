@@ -315,7 +315,7 @@ main() {
         });
 
         test('should correctly resolve redirect routes', () async {
-          router.root.addRedirect(name: 'foo', path: '/bar');
+          router.root.addRedirect(path: '/bar', toRoute: 'foo');
 
           AnchorElement anchor = new AnchorElement();
           anchor.href = router.normalizeUrl('/bar');

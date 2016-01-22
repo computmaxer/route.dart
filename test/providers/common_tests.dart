@@ -220,16 +220,15 @@ commonProviderTests(RouterFactory routerFactory) {
   });
 
   group('redirects', () {
-    test('addRedirect should throw if a matching route name doesn\'t exist',
-        () {
-      expect(() => router.root.addRedirect(name: 'baz', path: '/baz'),
+    test('addRedirect should throw if a matching route doesn\'t exist', () {
+      expect(() => router.root.addRedirect(path: '/baz', toRoute: 'baz'),
           throwsArgumentError);
     });
 
     test('should route a redirect path to a valid route path', () async {
       router.root
         ..addRoute(name: 'foo', path: '/foo')
-        ..addRedirect(name: 'foo', path: '/bar');
+        ..addRedirect(path: '/bar', toRoute: 'foo');
 
       await router.route('/bar');
       expect(router.activeUrl, '/foo');
@@ -240,7 +239,7 @@ commonProviderTests(RouterFactory routerFactory) {
     test('should preserve route params', () async {
       router.root
         ..addRoute(name: 'foo', path: '/foo/:whatever')
-        ..addRedirect(name: 'foo', path: '/bar/:whatever');
+        ..addRedirect(path: '/bar/:whatever', toRoute: 'foo');
 
       await router.route('/bar/something');
       expect(router.activeUrl, '/foo/something');
@@ -251,7 +250,7 @@ commonProviderTests(RouterFactory routerFactory) {
     test('should preserve route query params', () async {
       router.root
         ..addRoute(name: 'foo', path: '/foo/:whatever')
-        ..addRedirect(name: 'foo', path: '/bar/:whatever');
+        ..addRedirect(path: '/bar/:whatever', toRoute: 'foo');
 
       await router.route('/bar/something?what=ever');
       expect(router.activeUrl, '/foo/something?what=ever');

@@ -25,7 +25,7 @@ main() {
         enter: showR1One)
     ..addRoute(
         name: 'two', path: '/two', pageTitle: 'Route Two', enter: showR1Two)
-    ..addRedirect(name: 'two', path: '/redirect');
+    ..addRedirect(path: '/redirect', toRoute: 'two');
 
   querySelector('#R1linkOne').attributes['href'] = router.url('one');
   querySelector('#R1linkTwo').attributes['href'] = router.url('two');
@@ -51,7 +51,7 @@ main() {
         path: '/two',
         pageTitle: 'Route Two',
         enter: showR2Two)
-    ..addRedirect(name: 'two', path: '/redirect');
+    ..addRedirect(path: '/redirect', toRoute: 'two');
 
   querySelector('#R2linkOne').attributes['href'] = router2.url('one');
   querySelector('#R2linkTwo').attributes['href'] = router2.url('two');

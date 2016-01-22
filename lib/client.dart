@@ -135,7 +135,7 @@ abstract class Route {
       String pageTitle,
       List<Pattern> watchQueryParameters});
 
-  void addRedirect({String name, Pattern path});
+  void addRedirect({Pattern path, String toRoute});
 
   /**
    * Queries sub-routes using the [routePath] and returns the matching [Route].
@@ -279,14 +279,14 @@ class RouteImpl extends Route {
   }
 
   @override
-  void addRedirect({String name, Pattern path}) {
+  void addRedirect({Pattern path, String toRoute}) {
     // use the specified path matcher to route to an existing named path
-    if (_routes[name] == null) {
+    if (_routes[toRoute] == null) {
       throw new ArgumentError('redirect must specify an existing route name');
     }
 
     var matcher = path is UrlMatcher ? path : new UrlTemplate(path.toString());
-    _routes[name].redirects.add(matcher);
+    _routes[toRoute].redirects.add(matcher);
   }
 
   @override

@@ -94,7 +94,7 @@ main() {
       });
 
       test('should throw if adding a redirect', () {
-        expect(() => routeView.addRedirect(name: 'baz', path: '/baz'),
+        expect(() => routeView.addRedirect(path: '/baz', toRoute: 'baz'),
             throwsUnsupportedError);
       });
 

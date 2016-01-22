@@ -93,7 +93,7 @@ class RouteView implements Route {
 
   /// Not supported. Overridden to throw an error.
   @override
-  void addRedirect({String name, Pattern path}) {
+  void addRedirect({Pattern path, String toRoute}) {
     throw new UnsupportedError('addRedirect is not supported by RouteView');
   }
 
