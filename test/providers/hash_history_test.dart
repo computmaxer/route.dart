@@ -336,7 +336,6 @@ main() {
         setUp(() {
           mockWindow = new MockWindow();
           history = new HashHistory(windowImpl: mockWindow);
-          when(mockWindow.location.hash).thenReturn('#/foo');
           router = new Router(historyProvider: history);
           router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
         });
@@ -351,7 +350,7 @@ main() {
         test('it should be called if event triggered on anchor element',
             () async {
           AnchorElement anchor = new AnchorElement();
-          anchor.href = '#foo';
+          anchor.href = '#/foo';
           document.body.append(toRemove = anchor);
 
           router.listen(appRoot: anchor);
@@ -371,7 +370,7 @@ main() {
             () async {
           Element anchorChild = new DivElement();
           AnchorElement anchor = new AnchorElement();
-          anchor.href = '#foo';
+          anchor.href = '#/foo';
           anchor.append(anchorChild);
           document.body.append(toRemove = anchor);
 
@@ -381,6 +380,25 @@ main() {
           expect(router.findRoute('foo').isActive, isFalse);
 
           anchorChild.click();
+
+          await new Future.delayed(Duration.ZERO);
+          expect(history.pageTitle, equals('Foo'));
+          expect(router.findRoute('foo').isActive, isTrue);
+        });
+
+        test('should correctly resolve redirect routes', () async {
+          router.root.addRedirect(name: 'foo', path: '/bar');
+
+          AnchorElement anchor = new AnchorElement();
+          anchor.href = '#/bar';
+          document.body.append(toRemove = anchor);
+
+          router.listen(appRoot: anchor);
+
+          expect(history.pageTitle, equals('page title'));
+          expect(router.findRoute('foo').isActive, isFalse);
+
+          anchor.click();
 
           await new Future.delayed(Duration.ZERO);
           expect(history.pageTitle, equals('Foo'));

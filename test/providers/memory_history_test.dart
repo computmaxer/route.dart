@@ -313,6 +313,25 @@ main() {
           expect(history.pageTitle, equals('Foo'));
           expect(router.findRoute('foo').isActive, isTrue);
         });
+
+        test('should correctly resolve redirect routes', () async {
+          router.root.addRedirect(name: 'foo', path: '/bar');
+
+          AnchorElement anchor = new AnchorElement();
+          anchor.href = router.normalizeUrl('/bar');
+          document.body.append(toRemove = anchor);
+
+          router.listen(appRoot: anchor);
+
+          expect(history.pageTitle, equals(''));
+          expect(router.findRoute('foo').isActive, isFalse);
+
+          anchor.click();
+
+          await new Future.delayed(Duration.ZERO);
+          expect(history.pageTitle, equals('Foo'));
+          expect(router.findRoute('foo').isActive, isTrue);
+        });
       });
     });
 

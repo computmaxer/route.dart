@@ -135,6 +135,8 @@ abstract class Route {
       String pageTitle,
       List<Pattern> watchQueryParameters});
 
+  void addRedirect({String name, Pattern path});
+
   /**
    * Queries sub-routes using the [routePath] and returns the matching [Route].
    *
@@ -163,6 +165,7 @@ class RouteImpl extends Route {
   final String name;
   @override
   final UrlMatcher path;
+  List<UrlMatcher> redirects;
   @override
   final RouteImpl parent;
   @override
@@ -211,7 +214,8 @@ class RouteImpl extends Route {
             new StreamController<RoutePreLeaveEvent>.broadcast(sync: true),
         _onLeaveController =
             new StreamController<RouteLeaveEvent>.broadcast(sync: true),
-        _watchQueryParameters = watchQueryParameters;
+        _watchQueryParameters = watchQueryParameters,
+        redirects = [];
 
   @override
   void addRoute(
@@ -272,6 +276,17 @@ class RouteImpl extends Route {
       }
     }
     _routes[name] = route;
+  }
+
+  @override
+  void addRedirect({String name, Pattern path}) {
+    // use the specified path matcher to route to an existing named path
+    if (_routes[name] == null) {
+      throw new ArgumentError('redirect must specify an existing route name');
+    }
+
+    var matcher = path is UrlMatcher ? path : new UrlTemplate(path.toString());
+    _routes[name].redirects.add(matcher);
   }
 
   @override
@@ -533,9 +548,26 @@ class Router {
       baseRoute = _dehandle(startingFrom);
       trimmedActivePath = activePath.sublist(activePath.indexOf(baseRoute) + 1);
     }
-
     var treePath = _matchingTreePath(path, baseRoute);
-    // Figure out the list of routes that will be leaved
+
+    // calculate the reversedUrl to determine if any redirects have occurred
+    String reversedUrl = '';
+    for (int i = treePath.length - 1; i >= 0; i--) {
+      if (!treePath[i].isDefault) {
+        reversedUrl = treePath[i].route.path.reverse(
+            parameters: treePath[i].urlMatch.parameters, tail: reversedUrl);
+      }
+    }
+    reversedUrl +=
+        _buildQuery(treePath.isEmpty ? {} : treePath.last.queryParameters);
+
+    // if the path has been changed (via redirects), start route over
+    if (path != reversedUrl) {
+      return route(reversedUrl,
+          startingFrom: startingFrom, forceReload: forceReload);
+    }
+
+    // Figure out the list of routes that will be left
     var future =
         _preLeave(path, treePath, trimmedActivePath, baseRoute, forceReload)
             .then((success) {
@@ -546,6 +578,7 @@ class Router {
       return success;
     });
     _onRouteStart.add(new RouteStartEvent._new(path, future));
+
     return future;
   }
 
@@ -695,40 +728,55 @@ class Router {
   }
 
   /// Returns the direct child routes of [baseRoute] matching the given [path]
-  List<RouteImpl> _matchingRoutes(String path, RouteImpl baseRoute) {
-    var routes = baseRoute._routes.values
-        .where((RouteImpl r) => r.path.match(path) != null)
-        .toList();
+  List<_Match> _matchList(String path, RouteImpl baseRoute) {
+    List<_Match> matchList = [];
+    baseRoute._routes.values.forEach((RouteImpl r) {
+      // check for a conventional route match
+      UrlMatch match = r.path.match(path);
+      if (match != null) {
+        matchList.add(new _Match(r, match, _parseQuery(r, path), false));
+      } else {
+        // check for a redirect route match
+        for (UrlMatcher redirect in r.redirects) {
+          match = redirect.match(path);
+          if (match != null) {
+            matchList.add(new _Match(r, match, _parseQuery(r, path), false));
+          }
+        }
+      }
+    });
 
     return sortRoutes
-        ? (routes..sort((r1, r2) => r1.path.compareTo(r2.path)))
-        : routes;
+        ? (matchList..sort((m1, m2) => m1.route.path.compareTo(m2.route.path)))
+        : matchList;
   }
 
   /// Returns the path as a list of [_Match]
   List<_Match> _matchingTreePath(String path, RouteImpl baseRoute) {
     final treePath = <_Match>[];
-    Route matchedRoute;
+    _Match match;
     do {
-      matchedRoute = null;
-      List matchingRoutes = _matchingRoutes(path, baseRoute);
-      if (matchingRoutes.isNotEmpty) {
-        if (matchingRoutes.length > 1) {
-          _logger.fine("More than one route matches $path $matchingRoutes");
+      match = null;
+      List<_Match> matchList = _matchList(path, baseRoute);
+      if (matchList.isNotEmpty) {
+        if (matchList.length > 1) {
+          List<Route> matchedRoutes = [];
+          matchList.forEach((match) => matchedRoutes.add(match.route));
+          _logger.fine("More than one route matches $path $matchedRoutes");
         }
-        matchedRoute = matchingRoutes.first;
+        match = matchList.first;
       } else {
         if (baseRoute._defaultRoute != null) {
-          matchedRoute = baseRoute._defaultRoute;
+          match = new _Match(
+              baseRoute._defaultRoute, new UrlMatch('', '', {}), {}, true);
         }
       }
-      if (matchedRoute != null) {
-        var match = _getMatch(matchedRoute, path);
+      if (match != null) {
         treePath.add(match);
-        baseRoute = matchedRoute;
+        baseRoute = match.route;
         path = match.urlMatch.tail;
       }
-    } while (matchedRoute != null);
+    } while (match != null);
     return treePath;
   }
 
@@ -788,7 +836,7 @@ class Router {
     return route(newTail, startingFrom: baseRoute, forceReload: forceReload)
         .then((success) {
       if (success) {
-        _go(newUrl, replace);
+        _go(activeUrl, replace);
       }
       return success;
     });
@@ -837,15 +885,6 @@ class Router {
 
   Route _dehandle(Route r) => r is RouteHandle ? r._getHost(r) : r;
 
-  _Match _getMatch(Route route, String path) {
-    var match = route.path.match(path);
-    // default route
-    if (match == null) {
-      return new _Match(route, new UrlMatch('', '', {}), {});
-    }
-    return new _Match(route, match, _parseQuery(route, path));
-  }
-
   /// Parse the query string to a parameter `Map`
   Map<String, String> _parseQuery(Route route, String path) {
     var params = {};
@@ -889,12 +928,18 @@ class Router {
 
     // modified with history alternative
     _history.onChange.listen((_) {
-      route(_history.path).then((allowed) {
-        // if not allowed, we need to restore the browser location
-        if (!allowed) {
-          _history.back();
-        }
-      });
+      // only route if the new url isn't already active
+      if (activeUrl != _history.path) {
+        route(_history.path).then((allowed) {
+          // if not allowed, we need to restore the browser location
+          if (!allowed) {
+            _history.back();
+          } else if (activeUrl != _history.path) {
+            // replace the url in the case of redirects entered into browser address bar
+            _go(activeUrl, true);
+          }
+        });
+      }
     });
     route(_history.path);
 
@@ -916,12 +961,14 @@ class Router {
    * On older browsers [Location.assign] is used instead with the fragment
    * version of the UrlTemplate.
    */
-  Future<bool> gotoUrl(String url) => route(url).then((success) {
-        if (success) {
-          _go(url, false);
-        }
-        return success;
-      });
+  Future<bool> gotoUrl(String url) {
+    return route(url).then((success) {
+      if (success) {
+        _go(activeUrl, false);
+      }
+      return success;
+    });
+  }
 
   void _go(String path, bool replace) {
     _history.go(path, replace);
@@ -934,11 +981,25 @@ class Router {
   List<Route> get activePath {
     var res = <RouteImpl>[];
     var route = root;
+
     while (route._currentRoute != null) {
       route = route._currentRoute;
       res.add(route);
     }
     return res;
+  }
+
+  /**
+   * Returns the url string corresponding to the current active route path
+   */
+  String get activeUrl {
+    String activeUrl = '';
+    List<RouteImpl> path = activePath;
+    for (int i = path.length - 1; i >= 0; i--) {
+      activeUrl = path[i]._reverse(activeUrl);
+    }
+    activeUrl += _buildQuery(path.isEmpty ? {} : path.last.queryParameters);
+    return activeUrl;
   }
 
   /**
@@ -951,6 +1012,7 @@ class _Match {
   final RouteImpl route;
   final UrlMatch urlMatch;
   final Map queryParameters;
+  final bool isDefault;
 
-  _Match(this.route, this.urlMatch, this.queryParameters);
+  _Match(this.route, this.urlMatch, this.queryParameters, this.isDefault);
 }

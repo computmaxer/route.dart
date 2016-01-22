@@ -24,10 +24,14 @@ main() {
         pageTitle: 'Route One',
         enter: showR1One)
     ..addRoute(
-        name: 'two', path: '/two', pageTitle: 'Route Two', enter: showR1Two);
+        name: 'two', path: '/two', pageTitle: 'Route Two', enter: showR1Two)
+    ..addRedirect(name: 'two', path: '/redirect');
 
   querySelector('#R1linkOne').attributes['href'] = router.url('one');
   querySelector('#R1linkTwo').attributes['href'] = router.url('two');
+  querySelector('#R1redirectButton').onClick.listen((e) async {
+    router.gotoUrl('/redirect');
+  });
   querySelector('#R1linkBackButton').onClick.listen((e) {
     router.goBack();
   });
@@ -46,10 +50,14 @@ main() {
         defaultRoute: true,
         path: '/two',
         pageTitle: 'Route Two',
-        enter: showR2Two);
+        enter: showR2Two)
+    ..addRedirect(name: 'two', path: '/redirect');
 
   querySelector('#R2linkOne').attributes['href'] = router2.url('one');
   querySelector('#R2linkTwo').attributes['href'] = router2.url('two');
+  querySelector('#R2redirectButton').onClick.listen((e) {
+    router2.gotoUrl('/redirect');
+  });
   querySelector('#R2linkBackButton').onClick.listen((e) {
     router2.goBack();
   });

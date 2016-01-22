@@ -125,6 +125,11 @@ main() {
             throwsUnsupportedError);
       });
 
+      test('should throw if adding a redirect', () {
+        expect(() => routeHandle.addRedirect(name: 'baz', path: '/baz'),
+            throwsUnsupportedError);
+      });
+
       test('should throw if RouteHandle has already been discarded', () {
         routeHandle.discard();
         expect(() => routeHandle.newHandle(), throwsStateError);
