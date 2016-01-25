@@ -29,7 +29,7 @@ main() {
 
   querySelector('#R1linkOne').attributes['href'] = router.url('one');
   querySelector('#R1linkTwo').attributes['href'] = router.url('two');
-  querySelector('#R1redirectButton').onClick.listen((e) async {
+  querySelector('#R1redirectButton').onClick.listen((e) {
     router.gotoUrl('/redirect');
   });
   querySelector('#R1linkBackButton').onClick.listen((e) {
