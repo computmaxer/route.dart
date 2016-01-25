@@ -219,6 +219,46 @@ commonProviderTests(RouterFactory routerFactory) {
     });
   });
 
+  group('redirects', () {
+    test('addRedirect should throw if a matching route doesn\'t exist', () {
+      expect(() => router.root.addRedirect(path: '/baz', toRoute: 'baz'),
+          throwsArgumentError);
+    });
+
+    test('should route a redirect path to a valid route path', () async {
+      router.root
+        ..addRoute(name: 'foo', path: '/foo')
+        ..addRedirect(path: '/bar', toRoute: 'foo');
+
+      await router.route('/bar');
+      expect(router.activeUrl, '/foo');
+      expect(router.root.findRoute('foo').isActive, isTrue);
+      expect(router.isUrlActive('/foo'), isTrue);
+    });
+
+    test('should preserve route params', () async {
+      router.root
+        ..addRoute(name: 'foo', path: '/foo/:whatever')
+        ..addRedirect(path: '/bar/:whatever', toRoute: 'foo');
+
+      await router.route('/bar/something');
+      expect(router.activeUrl, '/foo/something');
+      expect(router.root.findRoute('foo').isActive, isTrue);
+      expect(router.isUrlActive('/foo'), isTrue);
+    });
+
+    test('should preserve route query params', () async {
+      router.root
+        ..addRoute(name: 'foo', path: '/foo/:whatever')
+        ..addRedirect(path: '/bar/:whatever', toRoute: 'foo');
+
+      await router.route('/bar/something?what=ever');
+      expect(router.activeUrl, '/foo/something?what=ever');
+      expect(router.root.findRoute('foo').isActive, isTrue);
+      expect(router.isUrlActive('/foo'), isTrue);
+    });
+  });
+
   group('hierarchical routing', () {
     void _testParentChild(Pattern parentPath, Pattern childPath,
         String expectedParentPath, String expectedChildPath, String testPath) {

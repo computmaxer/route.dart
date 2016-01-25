@@ -19,12 +19,13 @@ main() {
 
     group('go', () {
       MockWindow mockWindow;
+      BrowserHistory historyProvider;
       Router router;
 
       setUp(() {
         mockWindow = new MockWindow();
-        router = new Router(
-            historyProvider: new BrowserHistory(windowImpl: mockWindow));
+        historyProvider = new BrowserHistory(windowImpl: mockWindow);
+        router = new Router(historyProvider: historyProvider);
       });
 
       test('should use history.push/.replaceState when using BrowserHistory',
@@ -404,6 +405,25 @@ main() {
           expect(router.findRoute('foo').isActive, isFalse);
 
           anchorChild.click();
+
+          await new Future.delayed(Duration.ZERO);
+          expect(history.pageTitle, equals('Foo'));
+          expect(router.findRoute('foo').isActive, isTrue);
+        });
+
+        test('should correctly resolve redirect routes', () async {
+          router.root.addRedirect(path: '/bar', toRoute: 'foo');
+
+          AnchorElement anchor = new AnchorElement();
+          anchor.href = '/bar';
+          document.body.append(toRemove = anchor);
+
+          router.listen(appRoot: anchor);
+
+          expect(history.pageTitle, equals('page title'));
+          expect(router.findRoute('foo').isActive, isFalse);
+
+          anchor.click();
 
           await new Future.delayed(Duration.ZERO);
           expect(history.pageTitle, equals('Foo'));

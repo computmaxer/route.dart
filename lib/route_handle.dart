@@ -77,6 +77,12 @@ class RouteHandle implements Route {
     throw new UnsupportedError('addRoute is not supported in handle');
   }
 
+  /// Not supported. Overridden to throw an error.
+  @override
+  void addRedirect({Pattern path, String toRoute}) {
+    throw new UnsupportedError('addRedirect is not supported in handle');
+  }
+
   @override
   Route findRoute(String routePath) {
     Route r = _assertState(() => _getHost(_route).findRoute(routePath));
