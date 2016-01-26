@@ -21,10 +21,13 @@ main() {
         name: 'one',
         defaultRoute: true,
         path: '/one',
-        pageTitle: 'Route One',
+        pageTitle: (_) => 'Route One',
         enter: showR1One)
     ..addRoute(
-        name: 'two', path: '/two', pageTitle: 'Route Two', enter: showR1Two)
+        name: 'two',
+        path: '/two',
+        pageTitle: (_) => 'Route Two',
+        enter: showR1Two)
     ..addRedirect(path: '/redirect', toRoute: 'two');
 
   querySelector('#R1linkOne').attributes['href'] = router.url('one');
@@ -43,14 +46,8 @@ main() {
       new Router(useFragment: true, historyProvider: new MemoryHistory());
 
   router2.root
-    ..addRoute(
-        name: 'one', path: '/one', pageTitle: 'Route One', enter: showR2One)
-    ..addRoute(
-        name: 'two',
-        defaultRoute: true,
-        path: '/two',
-        pageTitle: 'Route Two',
-        enter: showR2Two)
+    ..addRoute(name: 'one', path: '/one', enter: showR2One)
+    ..addRoute(name: 'two', defaultRoute: true, path: '/two', enter: showR2Two)
     ..addRedirect(path: '/redirect', toRoute: 'two');
 
   querySelector('#R2linkOne').attributes['href'] = router2.url('one');

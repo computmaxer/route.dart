@@ -30,6 +30,8 @@ typedef void RouteEnterEventHandler(RouteEnterEvent event);
 typedef void RoutePreLeaveEventHandler(RoutePreLeaveEvent event);
 typedef void RouteLeaveEventHandler(RouteLeaveEvent event);
 
+typedef String PageTitleHandler(Route route);
+
 /**
  * WindowClickHandler can be used as a hook into [Router] to
  * modify behavior right after user clicks on an element, and
@@ -82,7 +84,7 @@ abstract class Route {
   /**
    * Used to set page title when the route [isActive].
    */
-  String get pageTitle;
+  PageTitleHandler pageTitle;
 
   /**
    * Returns a stream of [RoutePreEnterEvent] events. The [RoutePreEnterEvent]
@@ -132,7 +134,7 @@ abstract class Route {
       RouteLeaveEventHandler leave,
       mount,
       dontLeaveOnParamChanges: false,
-      String pageTitle,
+      PageTitleHandler pageTitle,
       List<Pattern> watchQueryParameters});
 
   void addRedirect({Pattern path, String toRoute});
@@ -169,7 +171,7 @@ class RouteImpl extends Route {
   @override
   final RouteImpl parent;
   @override
-  final String pageTitle;
+  final PageTitleHandler pageTitle;
 
   /// Child routes map route names to `Route` instances
   final _routes = <String, RouteImpl>{};
@@ -228,7 +230,7 @@ class RouteImpl extends Route {
       RouteLeaveEventHandler leave,
       mount,
       dontLeaveOnParamChanges: false,
-      String pageTitle,
+      PageTitleHandler pageTitle,
       List<Pattern> watchQueryParameters}) {
     if (name == null) {
       throw new ArgumentError('name is required for all routes');
@@ -573,7 +575,8 @@ class Router {
             .then((success) {
       // if the route change was successful, change the pageTitle
       if ((success) && (treePath.isNotEmpty)) {
-        _history.pageTitle = treePath.last.route.pageTitle;
+        _history.pageTitle =
+            treePath.last.route.pageTitle?.call(treePath.last.route);
       }
       return success;
     });

@@ -4,6 +4,8 @@ class MemoryHistory implements HistoryProvider {
   // keep a list of urls
   List<String> _urlList;
 
+  String _pageTitle = '';
+
   // keep track of a unique namespace for internal urls
   final String _namespace = 'router${new Uuid().v4()}:';
 
@@ -23,7 +25,13 @@ class MemoryHistory implements HistoryProvider {
 
   String get urlStub => _namespace;
 
-  String pageTitle = '';
+  String get pageTitle => _pageTitle;
+
+  void set pageTitle(String title) {
+    if (title != null) {
+      _pageTitle = title;
+    }
+  }
 
   void clickHandler(Event e, RouterLinkMatcher linkMatcher,
       Future<bool> gotoUrl(String url)) {

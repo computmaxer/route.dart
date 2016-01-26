@@ -23,7 +23,7 @@ main() {
                 name: 'foo2',
                 path: '/foo2/:fooParam',
                 dontLeaveOnParamChanges: true,
-                pageTitle: 'something'));
+                pageTitle: (_) => 'something'));
       fooRoute = router.findRoute('foo');
       fooRoute2 = router.findRoute('foo.foo2');
       routeView = new RouteView(fooRoute2,
@@ -70,8 +70,8 @@ main() {
       });
 
       test('pageTitle should match route.pageTitle', () {
-        expect(routeView.pageTitle, 'something');
-        expect(routeView.pageTitle, equals(fooRoute2.pageTitle));
+        expect(routeView.pageTitle(null), 'something');
+        expect(routeView.pageTitle(null), equals(fooRoute2.pageTitle(null)));
       });
 
       test('lifecycle events should match those of the supplied route', () {

@@ -18,12 +18,13 @@ main() {
 
     group('go', () {
       MockWindow mockWindow;
+      HashHistory historyProvider;
       Router router;
 
       setUp(() {
         mockWindow = new MockWindow();
-        router = new Router(
-            historyProvider: new HashHistory(windowImpl: mockWindow));
+        historyProvider = new HashHistory(windowImpl: mockWindow);
+        router = new Router(historyProvider: historyProvider);
       });
 
       test('should use location.assign/.replace when useFragment=true',
@@ -129,8 +130,8 @@ main() {
       });
 
       test('should update page title if the title property is set', () async {
-        router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
-
+        router.root
+            .addRoute(name: 'foo', path: '/foo', pageTitle: (_) => 'Foo');
         await router.go('foo', {});
         verify(mockWindow.document.title = 'Foo');
       });
@@ -143,6 +144,17 @@ main() {
 
         await router.go('foo', {});
         expect(mockWindow.document.title, equals('page title'));
+      });
+
+      test('should support dynamic pageTitle based on route params', () async {
+        router.root.addRoute(
+            name: 'foo',
+            path: '/foo/:param',
+            pageTitle: (Route route) =>
+                'Foo: ${route.parameters['param']} - ${route.queryParameters['what']}');
+        await router.go('foo', {'param': 'something'},
+            queryParameters: {'what': 'ever'});
+        expect(historyProvider.pageTitle, 'Foo: something - ever');
       });
     });
 
@@ -337,7 +349,8 @@ main() {
           mockWindow = new MockWindow();
           history = new HashHistory(windowImpl: mockWindow);
           router = new Router(historyProvider: history);
-          router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
+          router.root
+              .addRoute(name: 'foo', path: '/foo', pageTitle: (_) => 'Foo');
         });
 
         tearDown(() {

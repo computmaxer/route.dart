@@ -35,6 +35,7 @@ class RouteHandle implements Route {
             new StreamController<RoutePreLeaveEvent>.broadcast(sync: true),
         _onLeaveController =
             new StreamController<RouteLeaveEvent>.broadcast(sync: true) {
+    pageTitle = _route.pageTitle;
     _onEnterSubscription = _route.onEnter.listen(_onEnterController.add);
     _onPreEnterSubscription =
         _route.onPreEnter.listen(_onPreEnterController.add);
@@ -72,7 +73,7 @@ class RouteHandle implements Route {
       RouteLeaveEventHandler leave,
       mount,
       dontLeaveOnParamChanges: false,
-      String pageTitle,
+      PageTitleHandler pageTitle,
       List<Pattern> watchQueryParameters}) {
     throw new UnsupportedError('addRoute is not supported in handle');
   }
@@ -139,9 +140,9 @@ class RouteHandle implements Route {
   @override
   bool get dontLeaveOnParamChanges => _route.dontLeaveOnParamChanges;
 
-  /// See [Route.title]
+  /// See [Route.pageTitle]
   @override
-  String get pageTitle => _route.pageTitle;
+  PageTitleHandler pageTitle;
 
   @override
   Map get queryParameters => _route.queryParameters;

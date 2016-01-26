@@ -16,12 +16,13 @@ main() {
 
     group('go', () {
       List<String> urlHistory;
+      MemoryHistory historyProvider;
       Router router;
 
       setUp(() {
         urlHistory = [''];
-        router = new Router(
-            historyProvider: new MemoryHistory(urlHistory: urlHistory));
+        historyProvider = new MemoryHistory(urlHistory: urlHistory);
+        router = new Router(historyProvider: historyProvider);
       });
 
       test('should change the current url', () async {
@@ -119,6 +120,31 @@ main() {
         expect(counters, {'aEnter': 1, 'bEnter': 1});
         await router.go('a.b', {}, forceReload: true);
         expect(counters, {'aEnter': 2, 'bEnter': 2});
+      });
+
+      test('should update page title if the title property is set', () async {
+        router.root
+            .addRoute(name: 'foo', path: '/foo', pageTitle: (_) => 'Foo');
+        await router.go('foo', {});
+        expect(historyProvider.pageTitle, 'Foo');
+      });
+
+      test('should not change page title if the title property is not set',
+          () async {
+        router.root.addRoute(name: 'foo', path: '/foo');
+        await router.go('foo', {});
+        expect(historyProvider.pageTitle, '');
+      });
+
+      test('should support dynamic pageTitle based on route params', () async {
+        router.root.addRoute(
+            name: 'foo',
+            path: '/foo/:param',
+            pageTitle: (Route route) =>
+                'Foo: ${route.parameters['param']} - ${route.queryParameters['what']}');
+        await router.go('foo', {'param': 'something'},
+            queryParameters: {'what': 'ever'});
+        expect(historyProvider.pageTitle, 'Foo: something - ever');
       });
     });
 
@@ -265,7 +291,8 @@ main() {
         setUp(() {
           history = new MemoryHistory();
           router = new Router(historyProvider: history);
-          router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
+          router.root
+              .addRoute(name: 'foo', path: '/foo', pageTitle: (_) => 'Foo');
         });
 
         tearDown(() {

@@ -131,7 +131,8 @@ main() {
       });
 
       test('should update page title if the title property is set', () async {
-        router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
+        router.root
+            .addRoute(name: 'foo', path: '/foo', pageTitle: (_) => 'Foo');
 
         await router.go('foo', {});
         verify(mockWindow.document.title = 'Foo');
@@ -147,6 +148,17 @@ main() {
         verifyNever(mockWindow.document.title = 'Foo');
         expect(mockWindow.history.urlList.length, equals(1));
         expect(mockWindow.history.urlList.last, equals('/foo'));
+      });
+
+      test('should support dynamic pageTitle based on route params', () async {
+        router.root.addRoute(
+            name: 'foo',
+            path: '/foo/:param',
+            pageTitle: (Route route) =>
+                'Foo: ${route.parameters['param']} - ${route.queryParameters['what']}');
+        await router.go('foo', {'param': 'something'},
+            queryParameters: {'what': 'ever'});
+        expect(historyProvider.pageTitle, 'Foo: something - ever');
       });
     });
 
@@ -362,7 +374,8 @@ main() {
           var mockPopStateController = new StreamController<Event>(sync: true);
           when(mockWindow.onPopState).thenReturn(mockPopStateController.stream);
           router = new Router(historyProvider: history);
-          router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
+          router.root
+              .addRoute(name: 'foo', path: '/foo', pageTitle: (_) => 'Foo');
         });
 
         tearDown(() {
