@@ -30,6 +30,8 @@ typedef void RouteEnterEventHandler(RouteEnterEvent event);
 typedef void RoutePreLeaveEventHandler(RoutePreLeaveEvent event);
 typedef void RouteLeaveEventHandler(RouteLeaveEvent event);
 
+typedef String PageTitleHandler(Route route);
+
 /**
  * WindowClickHandler can be used as a hook into [Router] to
  * modify behavior right after user clicks on an element, and
@@ -81,8 +83,10 @@ abstract class Route {
 
   /**
    * Used to set page title when the route [isActive].
+   *
+   * pageTitle can be a static String or a PageTitleHandler
    */
-  String get pageTitle;
+  dynamic pageTitle;
 
   /**
    * Returns a stream of [RoutePreEnterEvent] events. The [RoutePreEnterEvent]
@@ -132,7 +136,7 @@ abstract class Route {
       RouteLeaveEventHandler leave,
       mount,
       dontLeaveOnParamChanges: false,
-      String pageTitle,
+      dynamic pageTitle,
       List<Pattern> watchQueryParameters});
 
   void addRedirect({Pattern path, String toRoute});
@@ -169,7 +173,7 @@ class RouteImpl extends Route {
   @override
   final RouteImpl parent;
   @override
-  final String pageTitle;
+  final dynamic pageTitle;
 
   /// Child routes map route names to `Route` instances
   final _routes = <String, RouteImpl>{};
@@ -228,7 +232,7 @@ class RouteImpl extends Route {
       RouteLeaveEventHandler leave,
       mount,
       dontLeaveOnParamChanges: false,
-      String pageTitle,
+      dynamic pageTitle,
       List<Pattern> watchQueryParameters}) {
     if (name == null) {
       throw new ArgumentError('name is required for all routes');
@@ -238,6 +242,11 @@ class RouteImpl extends Route {
     }
     if (_routes.containsKey(name)) {
       throw new ArgumentError('Route $name already exists');
+    }
+    if (!((pageTitle == null) ||
+        (pageTitle is String) ||
+        (pageTitle is PageTitleHandler))) {
+      throw new ArgumentError('pageTitle must be a String or PageTitleHandler');
     }
 
     var matcher = path is UrlMatcher ? path : new UrlTemplate(path.toString());
@@ -573,7 +582,10 @@ class Router {
             .then((success) {
       // if the route change was successful, change the pageTitle
       if ((success) && (treePath.isNotEmpty)) {
-        _history.pageTitle = treePath.last.route.pageTitle;
+        Route tailRoute = treePath.last.route;
+        var pageTitle = tailRoute.pageTitle;
+        _history.pageTitle =
+            pageTitle is String ? pageTitle : pageTitle?.call(tailRoute);
       }
       return success;
     });

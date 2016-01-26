@@ -148,6 +148,18 @@ main() {
         expect(mockWindow.history.urlList.length, equals(1));
         expect(mockWindow.history.urlList.last, equals('/foo'));
       });
+
+      test('should support dynamic pageTitle based on route properties',
+          () async {
+        router.root.addRoute(
+            name: 'foo',
+            path: '/foo/:param',
+            pageTitle: (Route route) =>
+                'Foo: ${route.parameters['param']} - ${route.queryParameters['what']}');
+        await router.go('foo', {'param': 'something'},
+            queryParameters: {'what': 'ever'});
+        expect(historyProvider.pageTitle, 'Foo: something - ever');
+      });
     });
 
     group('goBack', () {

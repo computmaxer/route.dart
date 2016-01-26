@@ -24,13 +24,17 @@ main() {
         pageTitle: 'Route One',
         enter: showR1One)
     ..addRoute(
-        name: 'two', path: '/two', pageTitle: 'Route Two', enter: showR1Two)
-    ..addRedirect(path: '/redirect', toRoute: 'two');
+        name: 'two',
+        path: '/two/:param',
+        pageTitle: (Route route) => 'Route Two: ${route.parameters['param']}',
+        enter: showR1Two)
+    ..addRedirect(path: '/redirect/:param', toRoute: 'two');
 
   querySelector('#R1linkOne').attributes['href'] = router.url('one');
-  querySelector('#R1linkTwo').attributes['href'] = router.url('two');
+  querySelector('#R1linkTwo').attributes['href'] =
+      router.url('two', parameters: {'param': '123'});
   querySelector('#R1redirectButton').onClick.listen((e) {
-    router.gotoUrl('/redirect');
+    router.gotoUrl('/redirect/redirect');
   });
   querySelector('#R1linkBackButton').onClick.listen((e) {
     router.goBack();
@@ -43,14 +47,8 @@ main() {
       new Router(useFragment: true, historyProvider: new MemoryHistory());
 
   router2.root
-    ..addRoute(
-        name: 'one', path: '/one', pageTitle: 'Route One', enter: showR2One)
-    ..addRoute(
-        name: 'two',
-        defaultRoute: true,
-        path: '/two',
-        pageTitle: 'Route Two',
-        enter: showR2Two)
+    ..addRoute(name: 'one', path: '/one', enter: showR2One)
+    ..addRoute(name: 'two', defaultRoute: true, path: '/two', enter: showR2Two)
     ..addRedirect(path: '/redirect', toRoute: 'two');
 
   querySelector('#R2linkOne').attributes['href'] = router2.url('one');

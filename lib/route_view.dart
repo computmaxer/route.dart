@@ -16,6 +16,7 @@ class RouteView implements Route {
 
   RouteView(Route route, {Map parameters, Map queryParameters}) {
     _route = route;
+    pageTitle = _route.pageTitle;
     _parameters = parameters ?? {};
     _queryParameters = queryParameters ?? {};
   }
@@ -56,7 +57,7 @@ class RouteView implements Route {
 
   /// See [Route.pageTitle]
   @override
-  String get pageTitle => _route.pageTitle;
+  dynamic pageTitle;
 
   /// See [Route.onPreEnter]
   @override
@@ -86,7 +87,7 @@ class RouteView implements Route {
       RouteLeaveEventHandler leave,
       mount,
       dontLeaveOnParamChanges: false,
-      String pageTitle,
+      dynamic pageTitle,
       List<Pattern> watchQueryParameters}) {
     throw new UnsupportedError('addRoute is not supported by RouteView');
   }
