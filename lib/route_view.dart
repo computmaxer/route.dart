@@ -57,7 +57,7 @@ class RouteView implements Route {
 
   /// See [Route.pageTitle]
   @override
-  PageTitleHandler pageTitle;
+  dynamic pageTitle;
 
   /// See [Route.onPreEnter]
   @override
@@ -87,7 +87,7 @@ class RouteView implements Route {
       RouteLeaveEventHandler leave,
       mount,
       dontLeaveOnParamChanges: false,
-      PageTitleHandler pageTitle,
+      dynamic pageTitle,
       List<Pattern> watchQueryParameters}) {
     throw new UnsupportedError('addRoute is not supported by RouteView');
   }

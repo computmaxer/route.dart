@@ -83,8 +83,10 @@ abstract class Route {
 
   /**
    * Used to set page title when the route [isActive].
+   *
+   * pageTitle can be a static String or a PageTitleHandler
    */
-  PageTitleHandler pageTitle;
+  dynamic pageTitle;
 
   /**
    * Returns a stream of [RoutePreEnterEvent] events. The [RoutePreEnterEvent]
@@ -134,7 +136,7 @@ abstract class Route {
       RouteLeaveEventHandler leave,
       mount,
       dontLeaveOnParamChanges: false,
-      PageTitleHandler pageTitle,
+      dynamic pageTitle,
       List<Pattern> watchQueryParameters});
 
   void addRedirect({Pattern path, String toRoute});
@@ -171,7 +173,7 @@ class RouteImpl extends Route {
   @override
   final RouteImpl parent;
   @override
-  final PageTitleHandler pageTitle;
+  final dynamic pageTitle;
 
   /// Child routes map route names to `Route` instances
   final _routes = <String, RouteImpl>{};
@@ -230,7 +232,7 @@ class RouteImpl extends Route {
       RouteLeaveEventHandler leave,
       mount,
       dontLeaveOnParamChanges: false,
-      PageTitleHandler pageTitle,
+      dynamic pageTitle,
       List<Pattern> watchQueryParameters}) {
     if (name == null) {
       throw new ArgumentError('name is required for all routes');
@@ -240,6 +242,11 @@ class RouteImpl extends Route {
     }
     if (_routes.containsKey(name)) {
       throw new ArgumentError('Route $name already exists');
+    }
+    if (!((pageTitle == null) ||
+        (pageTitle is String) ||
+        (pageTitle is PageTitleHandler))) {
+      throw new ArgumentError('pageTitle must be a String or PageTitleHandler');
     }
 
     var matcher = path is UrlMatcher ? path : new UrlTemplate(path.toString());
@@ -575,8 +582,10 @@ class Router {
             .then((success) {
       // if the route change was successful, change the pageTitle
       if ((success) && (treePath.isNotEmpty)) {
+        Route tailRoute = treePath.last.route;
+        var pageTitle = tailRoute.pageTitle;
         _history.pageTitle =
-            treePath.last.route.pageTitle?.call(treePath.last.route);
+            pageTitle is String ? pageTitle : pageTitle?.call(tailRoute);
       }
       return success;
     });

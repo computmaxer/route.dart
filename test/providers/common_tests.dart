@@ -62,6 +62,27 @@ commonProviderTests(RouterFactory routerFactory) {
       expect(() => router.root.addRoute(name: 'foo', path: '/foo'),
           throwsArgumentError);
     });
+
+    group('pageTitle', () {
+      test('should throw if pageTitle is an invalid type', () {
+        expect(
+            () =>
+                router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 123),
+            throwsArgumentError);
+      });
+
+      test('should NOT throw if pageTitle is a valid type', () {
+        router.root
+          ..addRoute(name: 'foo', path: '/foo')
+          ..addRoute(name: 'bar', path: '/bar', pageTitle: null)
+          ..addRoute(name: 'baz', path: '/baz', pageTitle: 'whatever')
+          ..addRoute(
+              name: 'buz',
+              path: '/buz',
+              pageTitle: (Route route) => 'something: ${route.name}');
+        // no expectation needed because a throw would fail the test
+      });
+    });
   });
 
   group('use a longer path first', () {

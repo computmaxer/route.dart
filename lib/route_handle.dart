@@ -73,7 +73,7 @@ class RouteHandle implements Route {
       RouteLeaveEventHandler leave,
       mount,
       dontLeaveOnParamChanges: false,
-      PageTitleHandler pageTitle,
+      dynamic pageTitle,
       List<Pattern> watchQueryParameters}) {
     throw new UnsupportedError('addRoute is not supported in handle');
   }
@@ -142,7 +142,7 @@ class RouteHandle implements Route {
 
   /// See [Route.pageTitle]
   @override
-  PageTitleHandler pageTitle;
+  dynamic pageTitle;
 
   @override
   Map get queryParameters => _route.queryParameters;

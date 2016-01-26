@@ -123,8 +123,7 @@ main() {
       });
 
       test('should update page title if the title property is set', () async {
-        router.root
-            .addRoute(name: 'foo', path: '/foo', pageTitle: (_) => 'Foo');
+        router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
         await router.go('foo', {});
         expect(historyProvider.pageTitle, 'Foo');
       });
@@ -291,8 +290,7 @@ main() {
         setUp(() {
           history = new MemoryHistory();
           router = new Router(historyProvider: history);
-          router.root
-              .addRoute(name: 'foo', path: '/foo', pageTitle: (_) => 'Foo');
+          router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
         });
 
         tearDown(() {

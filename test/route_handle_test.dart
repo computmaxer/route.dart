@@ -20,7 +20,7 @@ main() {
                 name: 'foo2',
                 path: '/foo2/:fooParam',
                 dontLeaveOnParamChanges: true,
-                pageTitle: (_) => 'something'))
+                pageTitle: 'something'))
         ..addRoute(name: 'bar', path: '/bar');
       fooRoute = router.findRoute('foo');
       fooRoute2 = router.findRoute('foo.foo2');
@@ -114,8 +114,8 @@ main() {
       });
 
       test('pageTitle should match route.pageTitle', () {
-        expect(routeHandle.pageTitle(null), 'something');
-        expect(routeHandle.pageTitle(null), equals(fooRoute2.pageTitle(null)));
+        expect(routeHandle.pageTitle, 'something');
+        expect(routeHandle.pageTitle, equals(fooRoute2.pageTitle));
       });
     });
 

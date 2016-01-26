@@ -130,8 +130,7 @@ main() {
       });
 
       test('should update page title if the title property is set', () async {
-        router.root
-            .addRoute(name: 'foo', path: '/foo', pageTitle: (_) => 'Foo');
+        router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
         await router.go('foo', {});
         verify(mockWindow.document.title = 'Foo');
       });
@@ -349,8 +348,7 @@ main() {
           mockWindow = new MockWindow();
           history = new HashHistory(windowImpl: mockWindow);
           router = new Router(historyProvider: history);
-          router.root
-              .addRoute(name: 'foo', path: '/foo', pageTitle: (_) => 'Foo');
+          router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
         });
 
         tearDown(() {

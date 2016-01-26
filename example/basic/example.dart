@@ -21,19 +21,20 @@ main() {
         name: 'one',
         defaultRoute: true,
         path: '/one',
-        pageTitle: (_) => 'Route One',
+        pageTitle: 'Route One',
         enter: showR1One)
     ..addRoute(
         name: 'two',
-        path: '/two',
-        pageTitle: (_) => 'Route Two',
+        path: '/two/:param',
+        pageTitle: (Route route) => 'Route Two: ${route.parameters['param']}',
         enter: showR1Two)
-    ..addRedirect(path: '/redirect', toRoute: 'two');
+    ..addRedirect(path: '/redirect/:param', toRoute: 'two');
 
   querySelector('#R1linkOne').attributes['href'] = router.url('one');
-  querySelector('#R1linkTwo').attributes['href'] = router.url('two');
+  querySelector('#R1linkTwo').attributes['href'] =
+      router.url('two', parameters: {'param': '123'});
   querySelector('#R1redirectButton').onClick.listen((e) {
-    router.gotoUrl('/redirect');
+    router.gotoUrl('/redirect/redirect');
   });
   querySelector('#R1linkBackButton').onClick.listen((e) {
     router.goBack();
