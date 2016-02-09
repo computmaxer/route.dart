@@ -10,6 +10,7 @@ import 'package:test/test.dart';
 import 'package:route_hierarchical/client.dart';
 
 import '../util/mocks.dart';
+import '../util/utils.dart';
 
 typedef Router RouterFactory();
 
@@ -308,10 +309,132 @@ commonProviderTests(RouterFactory routerFactory) {
   });
 
   group('Routable', () {
-    test('should configure routes when mounted', () {
+    test('should configure routes when mounted', () async {
       MockRoutable routable = new MockRoutable();
       expect(routable.routesConfigured, isFalse);
       router.root.addRoute(name: 'foo', path: '/foo', mount: routable);
+      expect(routable.routesConfigured, isTrue);
+
+      // verify that the route hierarchy routes as expected
+      await router.route('/foo');
+      expect(router.activeUrl, '/foo');
+      expect(nameFromRouteList(router.activePath), 'foo.default');
+
+      await router.route('/foo/foo');
+      expect(router.activeUrl, '/foo/foo');
+      expect(nameFromRouteList(router.activePath), 'foo.foo');
+
+      await router.route('/foo/bar');
+      expect(router.activeUrl, '/foo/bar');
+      expect(nameFromRouteList(router.activePath), 'foo.bar');
+    });
+
+    test('should support deferred loaded routes via RoutableFactory', () async {
+      MockRoutable routable;
+
+      // add a stand-in route stub
+      router.root.addRoute(
+          name: 'foo',
+          path: '/foo',
+          defaultRoute: true,
+          mount: () async {
+            return routable = new MockRoutable();
+          });
+
+      // routable class instance is not created before route is visited
+      expect(routable, isNull);
+      expect(routable is Routable, isFalse);
+
+      // verify that the route hierarchy routes as expected
+      await router.route('/foo');
+
+      // routable class instance is instantiated and its child routes are now valid
+      expect(routable, isNotNull);
+      expect(routable is Routable, isTrue);
+      expect(routable.routesConfigured, isTrue);
+
+      expect(router.activeUrl, '/foo');
+      expect(nameFromRouteList(router.activePath), 'foo.default');
+
+      await router.route('/foo/foo');
+      expect(router.activeUrl, '/foo/foo');
+      expect(nameFromRouteList(router.activePath), 'foo.foo');
+
+      await router.route('/foo/bar');
+      expect(router.activeUrl, '/foo/bar');
+      expect(nameFromRouteList(router.activePath), 'foo.bar');
+    });
+
+    test(
+        'should properly process default routes for deferred loaded route segments',
+        () async {
+      MockRoutable routable;
+
+      // add a stand-in route stub
+      router.root.addRoute(
+          name: 'foo',
+          path: '/foo',
+          defaultRoute: true,
+          mount: (Route child) {
+            child.addRoute(
+                name: 'baz',
+                path: '/baz',
+                defaultRoute: true,
+                mount: () async {
+                  return routable = new MockRoutable();
+                });
+          });
+
+      // routable class instance is not created before route is visited
+      expect(routable, isNull);
+      expect(routable is Routable, isFalse);
+
+      // verify that the route hierarchy routes as expected
+      await router.route('/foo');
+      expect(router.activeUrl, '/foo/baz');
+      expect(nameFromRouteList(router.activePath), 'foo.baz.default');
+
+      // routable class instance is instantiated and its child routes are now valid
+      expect(routable, isNotNull);
+      expect(routable is Routable, isTrue);
+      expect(routable.routesConfigured, isTrue);
+    });
+
+    test('should support multiple levels of deferred routes', () async {
+      MockRoutableDeep routable;
+
+      // add a stand-in route stub
+      router.root.addRoute(
+          name: 'foo',
+          path: '/foo',
+          defaultRoute: true,
+          mount: (Route child) {
+            child.addRoute(
+                name: 'baz',
+                path: '/baz',
+                defaultRoute: true,
+                mount: () async {
+                  return routable = new MockRoutableDeep();
+                });
+          });
+
+      // routable class instance is not created before route is visited
+      expect(routable, isNull);
+      expect(routable is Routable, isFalse);
+
+      // verify that the route hierarchy routes as expected
+      await router.route('/foo/baz/foo');
+      expect(router.activeUrl, '/foo/baz/foo');
+      expect(nameFromRouteList(router.activePath), 'foo.baz.foo.default');
+
+      // verify that the route hierarchy routes as expected
+      await router.route('/foo/baz');
+      expect(router.activeUrl, '/foo/baz');
+      expect(nameFromRouteList(router.activePath), 'foo.baz.default');
+
+      // routable class instance is instantiated and its child routes are now valid
+      expect(routable, isNotNull);
+      expect(routable is Routable, isTrue);
       expect(routable.routesConfigured, isTrue);
     });
   });

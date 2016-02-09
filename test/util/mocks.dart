@@ -101,6 +101,27 @@ class MockRouter extends Mock implements Router {}
 class MockRoutable implements Routable {
   bool routesConfigured = false;
   void configureRoute(Route router) {
+    router
+      ..addRoute(name: 'default', path: '', defaultRoute: true)
+      ..addRoute(name: 'foo', path: '/foo')
+      ..addRoute(name: 'bar', path: '/bar');
+    routesConfigured = true;
+  }
+}
+
+class MockRoutableDeep implements Routable {
+  bool routesConfigured = false;
+  Routable deepRoutable;
+
+  void configureRoute(Route router) {
+    router
+      ..addRoute(name: 'default', path: '', defaultRoute: true)
+      ..addRoute(
+          name: 'foo',
+          path: '/foo',
+          mount: () async {
+            return deepRoutable = new MockRoutable();
+          });
     routesConfigured = true;
   }
 }
