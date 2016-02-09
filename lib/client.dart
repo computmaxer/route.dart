@@ -21,6 +21,7 @@ import 'url_template.dart';
 
 part 'route_handle.dart';
 part 'route_view.dart';
+part 'routable.dart';
 
 final _logger = new Logger('route');
 const _PATH_SEPARATOR = '.';
@@ -188,6 +189,9 @@ class RouteImpl extends Route {
   /// The default child route
   RouteImpl _defaultRoute;
 
+  /// For deferred route loading support
+  RoutableFactory _routableFactory;
+
   /// The currently active child route
   RouteImpl _currentRoute;
   RouteEvent _lastEvent;
@@ -266,7 +270,9 @@ class RouteImpl extends Route {
       ..onLeave.listen(leave);
 
     if (mount != null) {
-      if (mount is Function) {
+      if (mount is RoutableFactory) {
+        route._routableFactory = mount;
+      } else if (mount is Function) {
         mount(route);
       } else if (mount is Routable) {
         mount.configureRoute(route);
@@ -471,10 +477,6 @@ class RouteStartEvent {
   RouteStartEvent._new(this.uri, this.completed);
 }
 
-abstract class Routable {
-  void configureRoute(Route router);
-}
-
 /**
  * Stores a set of [UrlTemplate] to [Handler] associations and provides methods
  * for calling a handler for a URL path, listening to [Window] history events,
@@ -558,23 +560,6 @@ class Router {
       trimmedActivePath = activePath.sublist(activePath.indexOf(baseRoute) + 1);
     }
     var treePath = _matchingTreePath(path, baseRoute);
-
-    // calculate the reversedUrl to determine if any redirects have occurred
-    String reversedUrl = '';
-    for (int i = treePath.length - 1; i >= 0; i--) {
-      if (!treePath[i].isDefault) {
-        reversedUrl = treePath[i].route.path.reverse(
-            parameters: treePath[i].urlMatch.parameters, tail: reversedUrl);
-      }
-    }
-    reversedUrl +=
-        _buildQuery(treePath.isEmpty ? {} : treePath.last.queryParameters);
-
-    // if the path has been changed (via redirects), start route over
-    if (path != reversedUrl) {
-      return route(reversedUrl,
-          startingFrom: startingFrom, forceReload: forceReload);
-    }
 
     // Figure out the list of routes that will be left
     var future =
@@ -660,6 +645,7 @@ class Router {
       toLeave._onPreLeaveController.add(event);
       preLeaving.addAll(event._allowLeaveFutures);
     });
+
     return Future.wait(preLeaving).then((List<bool> results) {
       if (!results.any((r) => r == false)) {
         var leaveFn = () => _leave(mustLeave, leaveBase);
@@ -710,6 +696,18 @@ class Router {
     if (toEnter.isEmpty) {
       leaveFn();
       return new Future.value(true);
+    }
+
+    // Check the last route segment to see if its child routes are loaded.
+    // If not, load the child routes and short-circuit the current routing
+    // operation by immediately re-routing with the same path.
+    if (toEnter.isNotEmpty && toEnter.last.route._routableFactory != null) {
+      RouteImpl lastRoute = toEnter.last.route;
+      return lastRoute._routableFactory().then((Routable routable) {
+        routable.configureRoute(lastRoute);
+        lastRoute._routableFactory = null;
+        return this.route(path);
+      });
     }
 
     var preEnterFutures = <Future<bool>>[];
