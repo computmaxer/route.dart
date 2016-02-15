@@ -4,4 +4,4 @@ abstract class Routable {
   void configureRoute(Route router);
 }
 
-typedef Future<Routable> RoutableFactory();
+typedef Future<Routable> RoutableFactory(Route router);

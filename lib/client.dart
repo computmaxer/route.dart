@@ -136,6 +136,7 @@ abstract class Route {
       RoutePreLeaveEventHandler preLeave,
       RouteLeaveEventHandler leave,
       mount,
+      RoutableFactory factory,
       dontLeaveOnParamChanges: false,
       dynamic pageTitle,
       List<Pattern> watchQueryParameters});
@@ -177,7 +178,7 @@ class RouteImpl extends Route {
   final dynamic pageTitle;
 
   /// Child routes map route names to `Route` instances
-  final _routes = <String, RouteImpl>{};
+  Map _routes = <String, RouteImpl>{};
 
   final StreamController<RouteEnterEvent> _onEnterController;
   final StreamController<RoutePreEnterEvent> _onPreEnterController;
@@ -190,7 +191,8 @@ class RouteImpl extends Route {
   RouteImpl _defaultRoute;
 
   /// For deferred route loading support
-  RoutableFactory _routableFactory;
+  Function _routableFactory;
+  bool _factoryRun = false;
 
   /// The currently active child route
   RouteImpl _currentRoute;
@@ -235,6 +237,7 @@ class RouteImpl extends Route {
       RoutePreLeaveEventHandler preLeave,
       RouteLeaveEventHandler leave,
       mount,
+      RoutableFactory factory,
       dontLeaveOnParamChanges: false,
       dynamic pageTitle,
       List<Pattern> watchQueryParameters}) {
@@ -270,13 +273,20 @@ class RouteImpl extends Route {
       ..onLeave.listen(leave);
 
     if (mount != null) {
-      if (mount is RoutableFactory) {
-        route._routableFactory = mount;
-      } else if (mount is Function) {
+//      if (mount is RoutableFactory) {
+//        route._routableFactory = mount;
+//      } else if (mount is Function) {
+      if (mount is Function) {
         mount(route);
       } else if (mount is Routable) {
         mount.configureRoute(route);
       }
+    }
+    if (factory != null) {
+//      route._routableFactory = factory;
+      route._routableFactory = () async {
+        return await factory(route);
+      };
     }
 
     if (defaultRoute) {
@@ -656,10 +666,17 @@ class Router {
     });
   }
 
-  void _leave(Iterable<Route> mustLeave, Route leaveBase) {
+  void _leave(Iterable<RouteImpl> mustLeave, Route leaveBase) {
     mustLeave.forEach((toLeave) {
       var event = new RouteLeaveEvent(toLeave);
       toLeave._onLeaveController.add(event);
+
+      // clear out old dynamic routes so the factory can be re-run when next needed
+      if (toLeave._routableFactory != null) {
+        toLeave._defaultRoute = null;
+        toLeave._routes = <String, RouteImpl>{};
+        toLeave._factoryRun = false;
+      }
     });
     if (!mustLeave.isEmpty) {
       _unsetAllCurrentRoutesRecursively(leaveBase);
@@ -701,13 +718,16 @@ class Router {
     // Check the last route segment to see if its child routes are loaded.
     // If not, load the child routes and short-circuit the current routing
     // operation by immediately re-routing with the same path.
-    if (toEnter.isNotEmpty && toEnter.last.route._routableFactory != null) {
+    if (toEnter.isNotEmpty) {
       RouteImpl lastRoute = toEnter.last.route;
-      return lastRoute._routableFactory().then((Routable routable) {
-        routable.configureRoute(lastRoute);
-        lastRoute._routableFactory = null;
-        return this.route(path);
-      });
+      if (lastRoute._routableFactory != null && !lastRoute._factoryRun) {
+        Function routableFactory = lastRoute._routableFactory;
+        lastRoute._factoryRun = true;
+        return routableFactory().then((Routable routable) {
+          routable.configureRoute(lastRoute);
+          return this.route(path);
+        });
+      }
     }
 
     var preEnterFutures = <Future<bool>>[];
