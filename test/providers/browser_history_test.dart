@@ -402,6 +402,25 @@ main() {
           expect(router.findRoute('foo').isActive, isTrue);
         });
 
+        test('it should not be called if anchor element has a target attribute',
+            () async {
+          AnchorElement anchor = new AnchorElement();
+          anchor.href = '/foo';
+          anchor.target = '_blank';
+          document.body.append(toRemove = anchor);
+
+          router.listen(appRoot: anchor);
+
+          expect(history.pageTitle, equals('page title'));
+          expect(router.findRoute('foo').isActive, isFalse);
+
+          anchor.click();
+
+          await new Future.delayed(Duration.ZERO);
+          expect(history.pageTitle, equals('page title'));
+          expect(router.findRoute('foo').isActive, isFalse);
+        });
+
         test(
             'it should be called if event triggered on child of an anchor element',
             () async {

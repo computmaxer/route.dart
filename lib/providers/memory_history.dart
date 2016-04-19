@@ -46,6 +46,10 @@ class MemoryHistory implements HistoryProvider {
     if (!linkMatcher.matches(anchor)) {
       return;
     }
+    if (anchor.target != null && anchor.target.isNotEmpty) {
+      // Prevent router from swallowing links that should open in another window
+      return;
+    }
     if (anchor.origin.startsWith(urlStub)) {
       e.preventDefault();
       gotoUrl(anchor.pathname);

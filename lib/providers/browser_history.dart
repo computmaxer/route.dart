@@ -38,6 +38,10 @@ class BrowserHistory implements HistoryProvider {
     if (!linkMatcher.matches(anchor)) {
       return;
     }
+    if (anchor.target != null && anchor.target.isNotEmpty) {
+      // Prevent router from swallowing links that should open in another window
+      return;
+    }
     if (anchor.host == _window.location.host) {
       e.preventDefault();
       gotoUrl('${anchor.pathname}${anchor.search}');
