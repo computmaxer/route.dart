@@ -1,5 +1,7 @@
 packages
 pubspec.lock
+.packages
+.pub/
 .buildlog
 build/
 /node_modules/
