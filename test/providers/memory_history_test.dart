@@ -147,6 +147,97 @@ main() {
       });
     });
 
+    group('gotoUrl', () {
+      List<String> urlHistory;
+      MemoryHistory historyProvider;
+      Router router;
+
+      setUp(() {
+        urlHistory = [''];
+        historyProvider = new MemoryHistory(urlHistory: urlHistory);
+        router = new Router(historyProvider: historyProvider);
+      });
+
+      test('should use history.push/.replaceState when using BrowserHistory',
+          () async {
+        router.root.addRoute(name: 'articles', path: '/articles');
+
+        expect(urlHistory, equals(['']));
+        await router.gotoUrl('/articles');
+        expect(urlHistory, equals(['', '/articles']));
+
+        await router.gotoUrl('/articles', replace: true);
+        expect(urlHistory, equals(['', '/articles']));
+      });
+
+      test('should support parameters in the URL', () async {
+        router.root.addRoute(name: 'foo', path: '/foo/:param');
+        await router.gotoUrl('/foo/something');
+        expect(urlHistory, equals(['', '/foo/something']));
+        expect(router.activePath.last.parameters, {'param': 'something'});
+      });
+
+      test('should support query parameters in the URL', () async {
+        router.root.addRoute(name: 'articles', path: '/articles');
+        await router.gotoUrl('/articles?foo=foo%20bar&bar=%25baz%2Baux');
+        expect(urlHistory,
+            equals(['', '/articles?foo=foo%20bar&bar=%25baz%2Baux']));
+        expect(router.activePath.last.queryParameters,
+            {'foo': 'foo bar', 'bar': '%baz+aux'});
+      });
+
+      test('should work with hierarchical routes', () async {
+        router.root
+          ..addRoute(
+              name: 'a',
+              path: '/:foo',
+              mount: (child) => child..addRoute(name: 'b', path: '/:bar'));
+
+        Route routeA = router.root.findRoute('a');
+        Route routeB = router.root.findRoute('a.b');
+
+        await router.gotoUrl('/aaaa');
+        expect(urlHistory, equals(['', '/aaaa']));
+        expect(routeA.isActive, true);
+        expect(routeA.parameters, {'foo': 'aaaa'});
+        expect(routeB.isActive, false);
+        expect(routeB.parameters, isNull);
+
+        await router.gotoUrl('/aaaa/bbbb');
+        expect(urlHistory, equals(['', '/aaaa', '/aaaa/bbbb']));
+        expect(routeA.parameters, {'foo': 'aaaa'});
+        expect(routeB.parameters, {'bar': 'bbbb'});
+      });
+
+      test('should update page title if the title property is set', () async {
+        router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
+
+        await router.gotoUrl('/foo');
+        expect(historyProvider.pageTitle, 'Foo');
+        expect(urlHistory, equals(['', '/foo']));
+      });
+
+      test('should not change page title if the title property is not set',
+          () async {
+        router.root.addRoute(name: 'foo', path: '/foo');
+
+        await router.gotoUrl('/foo');
+        expect(historyProvider.pageTitle, '');
+        expect(urlHistory, equals(['', '/foo']));
+      });
+
+      test('should support dynamic pageTitle based on route properties',
+          () async {
+        router.root.addRoute(
+            name: 'foo',
+            path: '/foo/:param',
+            pageTitle: (Route route) =>
+                'Foo: ${route.parameters['param']} - ${route.queryParameters['what']}');
+        await router.gotoUrl('/foo/something?what=ever');
+        expect(historyProvider.pageTitle, 'Foo: something - ever');
+      });
+    });
+
     group('goBack', () {
       test('should go to the previous route', () async {
         List<String> urlHistory = [];

@@ -54,12 +54,12 @@ class MockHistory extends Mock implements History {
     urlList.removeLast();
   }
 
-  replaceState(Object data, String title, [String url]) {
+  replaceState(Object data, String title, String url, [Map options]) {
     urlList.removeLast();
     urlList.add(url);
   }
 
-  pushState(Object data, String title, [String url]) {
+  pushState(Object data, String title, String url, [Map options]) {
     urlList.add(url);
   }
 }
