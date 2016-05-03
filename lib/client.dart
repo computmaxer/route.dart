@@ -971,10 +971,10 @@ class Router {
    * On older browsers [Location.assign] is used instead with the fragment
    * version of the UrlTemplate.
    */
-  Future<bool> gotoUrl(String url) {
+  Future<bool> gotoUrl(String url, {bool replace: false}) {
     return route(url).then((success) {
       if (success) {
-        _go(activeUrl, false);
+        _go(activeUrl, replace);
       }
       return success;
     });
