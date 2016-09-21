@@ -951,7 +951,12 @@ class Router {
         });
       }
     });
-    route(_history.path);
+    route(_history.path).then((allowed) {
+      if (!allowed) {
+        _logger.fine('Initial route not allowed: ${_history.path}');
+        route('');
+      }
+    });
 
     if (!ignoreClick) {
       if (appRoot == null) {
