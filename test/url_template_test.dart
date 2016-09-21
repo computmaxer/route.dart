@@ -78,16 +78,27 @@ main() {
       tmpl = new UrlTemplate(':a/bar/baz');
       expect(tmpl.urlParameterNames, equals(['a']));
       expect(tmpl.reverse(), 'null/bar/baz');
-      expect(tmpl.reverse(parameters: {'a': '/foo',}), '/foo/bar/baz');
+      expect(
+          tmpl.reverse(parameters: {
+            'a': '/foo',
+          }),
+          '/foo/bar/baz');
 
       tmpl = new UrlTemplate('/foo/bar/:c');
       expect(tmpl.urlParameterNames, equals(['c']));
       expect(tmpl.reverse(), '/foo/bar/null');
-      expect(tmpl.reverse(parameters: {'c': 'baz',}), '/foo/bar/baz');
+      expect(
+          tmpl.reverse(parameters: {
+            'c': 'baz',
+          }),
+          '/foo/bar/baz');
 
       tmpl = new UrlTemplate('/foo/bar/:c');
       expect(tmpl.urlParameterNames, equals(['c']));
-      expect(tmpl.reverse(tail: '/tail', parameters: {'c': 'baz',}),
+      expect(
+          tmpl.reverse(tail: '/tail', parameters: {
+            'c': 'baz',
+          }),
           '/foo/bar/baz/tail');
     });
 
