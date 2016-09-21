@@ -458,6 +458,35 @@ main() {
           await nextTick();
           expect(mockWindow.history.backCalled, isTrue);
         });
+
+        test('should handle route rejection on initial URL', () async {
+          var mockWindow = new MockWindow();
+          when(mockWindow.path).thenReturn('/foo');
+          var router = new Router(
+              historyProvider: new BrowserHistory(windowImpl: mockWindow));
+          var fallbackCompleter = new Completer();
+          router.root
+            ..addRoute(
+                name: 'fallback',
+                path: '/fallback',
+                defaultRoute: true,
+                enter: (RouteEnterEvent e) {
+                  print('Fallback!');
+                  if (!fallbackCompleter.isCompleted) {
+                    fallbackCompleter.complete();
+                  }
+                })
+            ..addRoute(
+                name: 'foo',
+                path: '/foo',
+                preEnter: (RoutePreEnterEvent e) {
+                  return e.allowEnter(new Future.value(false));
+                })
+            ..addRoute(name: 'bar', path: '/bar');
+
+          fallbackCompleter.future.then(expectAsync((_) {}, count: 1));
+          router.listen();
+        });
       });
 
       group('links', () {
