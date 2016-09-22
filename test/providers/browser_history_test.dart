@@ -461,7 +461,9 @@ main() {
 
         test('should handle route rejection on initial URL', () async {
           var mockWindow = new MockWindow();
-          when(mockWindow.path).thenReturn('/foo');
+          when(mockWindow.location.pathname).thenReturn('/foo');
+          when(mockWindow.location.search).thenReturn('');
+          when(mockWindow.location.hash).thenReturn('');
           var router = new Router(
               historyProvider: new BrowserHistory(windowImpl: mockWindow));
           var fallbackCompleter = new Completer();
@@ -471,7 +473,6 @@ main() {
                 path: '/fallback',
                 defaultRoute: true,
                 enter: (RouteEnterEvent e) {
-                  print('Fallback!');
                   if (!fallbackCompleter.isCompleted) {
                     fallbackCompleter.complete();
                   }
