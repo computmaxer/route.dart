@@ -443,7 +443,12 @@ commonProviderTests(RouterFactory routerFactory) {
     Map counters;
 
     setUp(() {
-      counters = {'fooLeave': 0, 'fooEnter': 0, 'barLeave': 0, 'barEnter': 0,};
+      counters = {
+        'fooLeave': 0,
+        'fooEnter': 0,
+        'barLeave': 0,
+        'barEnter': 0,
+      };
 
       router.root
         ..addRoute(
@@ -466,32 +471,56 @@ commonProviderTests(RouterFactory routerFactory) {
 
     test('should reload currently active route', () async {
       await router.route('/123');
-      expect(counters,
-          {'fooLeave': 0, 'fooEnter': 1, 'barLeave': 0, 'barEnter': 0,});
+      expect(counters, {
+        'fooLeave': 0,
+        'fooEnter': 1,
+        'barLeave': 0,
+        'barEnter': 0,
+      });
       await router.reload();
-      expect(counters,
-          {'fooLeave': 1, 'fooEnter': 2, 'barLeave': 0, 'barEnter': 0,});
+      expect(counters, {
+        'fooLeave': 1,
+        'fooEnter': 2,
+        'barLeave': 0,
+        'barEnter': 0,
+      });
       expect(router.findRoute('foo').parameters['foo'], '123');
     });
 
     test('should reload currently active route from startingFrom', () async {
       await router.route('/123/321');
-      expect(counters,
-          {'fooLeave': 0, 'fooEnter': 1, 'barLeave': 0, 'barEnter': 1,});
+      expect(counters, {
+        'fooLeave': 0,
+        'fooEnter': 1,
+        'barLeave': 0,
+        'barEnter': 1,
+      });
       await router.reload(startingFrom: router.findRoute('foo'));
-      expect(counters,
-          {'fooLeave': 0, 'fooEnter': 1, 'barLeave': 1, 'barEnter': 2,});
+      expect(counters, {
+        'fooLeave': 0,
+        'fooEnter': 1,
+        'barLeave': 1,
+        'barEnter': 2,
+      });
       expect(router.findRoute('foo').parameters['foo'], '123');
       expect(router.findRoute('foo.bar').parameters['bar'], '321');
     });
 
     test('should preserve param values on reload', () async {
       await router.route('/123/321');
-      expect(counters,
-          {'fooLeave': 0, 'fooEnter': 1, 'barLeave': 0, 'barEnter': 1,});
+      expect(counters, {
+        'fooLeave': 0,
+        'fooEnter': 1,
+        'barLeave': 0,
+        'barEnter': 1,
+      });
       await router.reload();
-      expect(counters,
-          {'fooLeave': 1, 'fooEnter': 2, 'barLeave': 1, 'barEnter': 2,});
+      expect(counters, {
+        'fooLeave': 1,
+        'fooEnter': 2,
+        'barLeave': 1,
+        'barEnter': 2,
+      });
       expect(router.findRoute('foo').parameters['foo'], '123');
       expect(router.findRoute('foo.bar').parameters['bar'], '321');
     });
@@ -500,25 +529,41 @@ commonProviderTests(RouterFactory routerFactory) {
       await router.route('/123?foo=bar&blah=blah');
       expect(counters,
           {'fooLeave': 0, 'fooEnter': 1, 'barLeave': 0, 'barEnter': 0});
-      expect(router.findRoute('foo').queryParameters,
-          {'foo': 'bar', 'blah': 'blah',});
+      expect(router.findRoute('foo').queryParameters, {
+        'foo': 'bar',
+        'blah': 'blah',
+      });
       await router.reload();
-      expect(router.findRoute('foo').queryParameters,
-          {'foo': 'bar', 'blah': 'blah',});
+      expect(router.findRoute('foo').queryParameters, {
+        'foo': 'bar',
+        'blah': 'blah',
+      });
     });
 
     test('should preserve query param values on reload from the middle',
         () async {
       await router.route('/123/321?foo=bar&blah=blah');
-      expect(counters,
-          {'fooLeave': 0, 'fooEnter': 1, 'barLeave': 0, 'barEnter': 1,});
-      expect(router.findRoute('foo').queryParameters,
-          {'foo': 'bar', 'blah': 'blah',});
+      expect(counters, {
+        'fooLeave': 0,
+        'fooEnter': 1,
+        'barLeave': 0,
+        'barEnter': 1,
+      });
+      expect(router.findRoute('foo').queryParameters, {
+        'foo': 'bar',
+        'blah': 'blah',
+      });
       await router.reload(startingFrom: router.findRoute('foo'));
-      expect(counters,
-          {'fooLeave': 0, 'fooEnter': 1, 'barLeave': 1, 'barEnter': 2,});
-      expect(router.findRoute('foo').queryParameters,
-          {'foo': 'bar', 'blah': 'blah',});
+      expect(counters, {
+        'fooLeave': 0,
+        'fooEnter': 1,
+        'barLeave': 1,
+        'barEnter': 2,
+      });
+      expect(router.findRoute('foo').queryParameters, {
+        'foo': 'bar',
+        'blah': 'blah',
+      });
       expect(router.findRoute('foo').parameters['foo'], '123');
       expect(router.findRoute('foo.bar').parameters['bar'], '321');
     });
@@ -1286,7 +1331,9 @@ commonProviderTests(RouterFactory routerFactory) {
               name: 'foo',
               path: '/:foo',
               enter: expectAsync((RouteEvent e) {
-                expect(e.parameters, {'foo': '123',});
+                expect(e.parameters, {
+                  'foo': '123',
+                });
                 expect(e.queryParameters, {'a': 'b', 'b': '', 'c': 'foo bar'});
               }));
 
@@ -1294,7 +1341,10 @@ commonProviderTests(RouterFactory routerFactory) {
       });
 
       test('should not reload when unwatched query param changes', () async {
-        var counters = {'fooLeave': 0, 'fooEnter': 0,};
+        var counters = {
+          'fooLeave': 0,
+          'fooEnter': 0,
+        };
         router.root
           ..addRoute(
               name: 'foo',
@@ -1304,13 +1354,22 @@ commonProviderTests(RouterFactory routerFactory) {
               enter: (_) => counters['fooEnter']++);
 
         await router.route('/123');
-        expect(counters, {'fooLeave': 0, 'fooEnter': 1,});
+        expect(counters, {
+          'fooLeave': 0,
+          'fooEnter': 1,
+        });
         await router.route('/123?foo=bar');
-        expect(counters, {'fooLeave': 0, 'fooEnter': 1,});
+        expect(counters, {
+          'fooLeave': 0,
+          'fooEnter': 1,
+        });
       });
 
       test('should reload when watched query param changes', () async {
-        var counters = {'fooLeave': 0, 'fooEnter': 0,};
+        var counters = {
+          'fooLeave': 0,
+          'fooEnter': 0,
+        };
         router.root
           ..addRoute(
               name: 'foo',
@@ -1320,13 +1379,22 @@ commonProviderTests(RouterFactory routerFactory) {
               enter: (_) => counters['fooEnter']++);
 
         await router.route('/123');
-        expect(counters, {'fooLeave': 0, 'fooEnter': 1,});
+        expect(counters, {
+          'fooLeave': 0,
+          'fooEnter': 1,
+        });
         await router.route('/123?foo=bar');
-        expect(counters, {'fooLeave': 1, 'fooEnter': 2,});
+        expect(counters, {
+          'fooLeave': 1,
+          'fooEnter': 2,
+        });
       });
 
       test('should match pattern for watched query params', () async {
-        var counters = {'fooLeave': 0, 'fooEnter': 0,};
+        var counters = {
+          'fooLeave': 0,
+          'fooEnter': 0,
+        };
         router.root
           ..addRoute(
               name: 'foo',
@@ -1336,9 +1404,15 @@ commonProviderTests(RouterFactory routerFactory) {
               enter: (_) => counters['fooEnter']++);
 
         await router.route('/123');
-        expect(counters, {'fooLeave': 0, 'fooEnter': 1,});
+        expect(counters, {
+          'fooLeave': 0,
+          'fooEnter': 1,
+        });
         await router.route('/123?foo=bar');
-        expect(counters, {'fooLeave': 1, 'fooEnter': 2,});
+        expect(counters, {
+          'fooLeave': 1,
+          'fooEnter': 2,
+        });
       });
     });
 

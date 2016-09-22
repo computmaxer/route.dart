@@ -40,17 +40,37 @@ main() {
       routeHandle.onEnter.listen((_) => counters['Enter']++);
       routeHandle.onLeave.listen((_) => counters['Leave']++);
 
-      expect(counters, {'PreEnter': 0, 'PreLeave': 0, 'Enter': 0, 'Leave': 0,});
+      expect(counters, {
+        'PreEnter': 0,
+        'PreLeave': 0,
+        'Enter': 0,
+        'Leave': 0,
+      });
 
       await router.route('/foo');
-      expect(counters, {'PreEnter': 1, 'PreLeave': 0, 'Enter': 1, 'Leave': 0,});
+      expect(counters, {
+        'PreEnter': 1,
+        'PreLeave': 0,
+        'Enter': 1,
+        'Leave': 0,
+      });
 
       await router.route('/bar');
-      expect(counters, {'PreEnter': 1, 'PreLeave': 1, 'Enter': 1, 'Leave': 1,});
+      expect(counters, {
+        'PreEnter': 1,
+        'PreLeave': 1,
+        'Enter': 1,
+        'Leave': 1,
+      });
 
       routeHandle.discard();
       await router.route('/foo');
-      expect(counters, {'PreEnter': 1, 'PreLeave': 1, 'Enter': 1, 'Leave': 1,});
+      expect(counters, {
+        'PreEnter': 1,
+        'PreLeave': 1,
+        'Enter': 1,
+        'Leave': 1,
+      });
     });
 
     test('should return valid RouteHandles for child routes', () {
