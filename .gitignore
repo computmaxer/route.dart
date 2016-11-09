@@ -4,6 +4,7 @@ pubspec.lock
 .pub/
 .buildlog
 build/
+coverage/
 /node_modules/
 /test/out/
 /npm-debug.log
