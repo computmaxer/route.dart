@@ -772,7 +772,7 @@ class Router {
         if (matchList.length > 1) {
           List<Route> matchedRoutes = [];
           matchList.forEach((match) => matchedRoutes.add(match.route));
-          _logger.fine("More than one route matches $path $matchedRoutes");
+          _logger.finest("More than one route matches $path $matchedRoutes");
         }
         match = matchList.first;
       } else {
