@@ -1,5 +1,3 @@
-library route.url_matcher_test;
-
 import 'package:test/test.dart';
 import 'package:route_hierarchical/url_matcher.dart';
 

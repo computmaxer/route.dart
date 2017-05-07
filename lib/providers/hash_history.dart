@@ -1,5 +1,7 @@
 part of route.history_provider;
 
+/// [HistoryProvider] that uses paths + fragments (e.g. http://base#/my/route)
+/// and manages url history via [Location.assign] and [Location.replace].
 class HashHistory implements HistoryProvider {
   Window _window;
   String _pageTitle;

@@ -1,5 +1,3 @@
-library route.providers.hash_history_test;
-
 import 'dart:async';
 import 'dart:html';
 

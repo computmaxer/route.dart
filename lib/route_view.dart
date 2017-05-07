@@ -1,14 +1,12 @@
 part of route.client;
 
-/**
- * A helper RouteView object that supplies a read-only view of route
- * information.  This is intended as a source of route information for a
- * particular route in a particular state and, unlike Route, does NOT imply
- * that this route configuration is currently active.
- *
- * A RouteView should be used as a source of information ONLY and
- * should not be used for any other routing operations.
- */
+/// A helper [RouteView] object that supplies a read-only view of [Route]
+/// information.  This is intended as a source of [Route] information for a
+/// particular [Route] in a particular state and, unlike [Route], does NOT imply
+/// that this [Route] configuration is currently active.
+///
+/// A [RouteView] should be used as a source of information ONLY and
+/// should not be used for any other routing operations.
 class RouteView implements Route {
   Route _route;
   Map _parameters;
@@ -37,17 +35,13 @@ class RouteView implements Route {
   @override
   bool get isActive => _route.isActive;
 
-  /**
-   * Returns parameters for the specified RouteView.  Non-empty parameters
-   * does NOT imply that the specified route is currently active.
-   */
+  /// Returns parameters for the specified RouteView.  Non-empty parameters
+  /// does NOT imply that the specified route is currently active.
   @override
   Map get parameters => _parameters;
 
-  /**
-   * Returns query parameters for the specified RouteView.  Non-empty query
-   * parameters does NOT imply that the specified route is currently active.
-   */
+  /// Returns query parameters for the specified RouteView.  Non-empty query
+  /// parameters does NOT imply that the specified route is currently active.
   @override
   Map get queryParameters => _queryParameters;
 

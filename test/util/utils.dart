@@ -1,5 +1,3 @@
-library route.test.util.utils;
-
 import 'dart:async';
 
 import 'package:route_hierarchical/client.dart';

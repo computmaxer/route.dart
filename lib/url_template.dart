@@ -1,15 +1,11 @@
-library url_template;
-
 import 'url_matcher.dart';
 
 final _specialChars = new RegExp(r'[\\()$^.+[\]{}|]');
 final _paramPattern = r'([^/?]+)';
 final _paramWithSlashesPattern = r'([^?]+)';
 
-/**
- * A reversible URL template class that can match/parse and reverse URL
- * templates like: /foo/:bar/baz
- */
+/// A reversible URL template class that can match/parse and reverse URL
+/// templates like: /foo/:bar/baz
 class UrlTemplate implements UrlMatcher {
   // Parameter names of the template ie  `['bar']` for `/foo/:bar/baz`
   List<String> _fields;
@@ -17,16 +13,14 @@ class UrlTemplate implements UrlMatcher {
   // The compiled template
   RegExp _pattern;
 
-  /**
-   * The template exploded as parts
-   * - even indexes contain text
-   * - odd indexes contain closures that return the parameter value
-   *
-   * `/foo/:bar/baz` produces:
-   * - [0] = `/foo/`
-   * - [1] = `(p) => p['bar']`
-   * - [2] = `/baz`
-   */
+  /// The template exploded as parts
+  /// - even indexes contain text
+  /// - odd indexes contain closures that return the parameter value
+  ///
+  /// `/foo/:bar/baz` produces:
+  /// - [0] = `/foo/`
+  /// - [1] = `(p) => p['bar']`
+  /// - [2] = `/baz`
   List _chunks;
 
   String toString() => 'UrlTemplate($_pattern)';

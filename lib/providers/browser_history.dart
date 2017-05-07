@@ -1,5 +1,7 @@
 part of route.history_provider;
 
+/// [HistoryProvider] that uses pure paths (e.g. http://base/my/route) and
+/// manages url history via [History.pushState] and [History.replaceState].
 class BrowserHistory implements HistoryProvider {
   Window _window;
   String _pageTitle;

@@ -1,5 +1,3 @@
-library example;
-
 import 'dart:html';
 
 import 'package:logging/logging.dart';

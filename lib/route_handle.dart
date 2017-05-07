@@ -1,9 +1,7 @@
 part of route.client;
 
-/**
- * A helper Router handle that scopes all route event subscriptions to it's
- * instance and provides an convenience [discard] method.
- */
+/// A helper [Route] handle that scopes all route event subscriptions to its
+/// instance and provides a convenience [discard] method for proper disposal.
 class RouteHandle implements Route {
   Route _route;
   final StreamController<RoutePreEnterEvent> _onPreEnterController;
@@ -44,7 +42,8 @@ class RouteHandle implements Route {
     _onLeaveSubscription = _route.onLeave.listen(_onLeaveController.add);
   }
 
-  /// discards this handle.
+  /// Cancels and discards all event subscriptions for this [Route] and all
+  /// children.
   void discard() {
     _logger.finest('discarding handle for $_route');
     _onPreEnterSubscription.cancel();
@@ -93,9 +92,7 @@ class RouteHandle implements Route {
     return handle;
   }
 
-  /**
-   * Create an return a new [RouteHandle] for this route.
-   */
+  /// Create an return a new [RouteHandle] for this route.
   @override
   RouteHandle newHandle() {
     _logger.finest('newHandle for $this');

@@ -1,5 +1,7 @@
 part of route.history_provider;
 
+/// [HistoryProvider] that uses a simple List<String> to manage url history.
+/// Routing with a [MemoryHistory] will not affect the web browser url bar.
 class MemoryHistory implements HistoryProvider {
   // keep a list of urls
   List<String> _urlList;
