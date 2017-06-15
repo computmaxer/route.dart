@@ -414,19 +414,21 @@ main() {
           router.listen(ignoreClick: true);
         }
 
-        test('should route current path on listen with pop', () {
+        test('should route current path on listen with pop', () async {
           var mockWindow = new MockWindow();
           var mockPopStateController = new StreamController<Event>(sync: true);
           when(mockWindow.onPopState).thenReturn(mockPopStateController.stream);
           testInit(mockWindow, 2);
           mockPopStateController.add(null);
+          await mockPopStateController.close();
         });
 
-        test('should route current path on listen without pop', () {
+        test('should route current path on listen without pop', () async {
           var mockWindow = new MockWindow();
           var mockPopStateController = new StreamController<Event>(sync: true);
           when(mockWindow.onPopState).thenReturn(mockPopStateController.stream);
           testInit(mockWindow);
+          await mockPopStateController.close();
         });
 
         test('should process url changes for route rejection', () async {
@@ -495,17 +497,19 @@ main() {
         HistoryProvider history;
         Router router;
         Element toRemove;
+        StreamController mockPopStateController;
 
         setUp(() {
           mockWindow = new MockWindow();
           history = new BrowserHistory(windowImpl: mockWindow);
-          var mockPopStateController = new StreamController<Event>(sync: true);
+          mockPopStateController = new StreamController<Event>(sync: true);
           when(mockWindow.onPopState).thenReturn(mockPopStateController.stream);
           router = new Router(historyProvider: history);
           router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
         });
 
-        tearDown(() {
+        tearDown(() async {
+          await mockPopStateController?.close();
           if (toRemove != null) {
             toRemove.remove();
             toRemove = null;
