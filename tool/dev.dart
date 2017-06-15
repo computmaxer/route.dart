@@ -27,7 +27,8 @@ main(List<String> args) async {
   config.format.directories = dirs;
 
   config.test
-    ..platforms = ['content-shell']
+    ..concurrency = 1
+    ..platforms = ['chrome']
     ..unitTests = ['test/all_web_tests.dart'];
 
   await dev(args);
