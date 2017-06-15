@@ -9,12 +9,12 @@ dependencies:
   logging: any
   uuid: "^0.5.0"
 dev_dependencies:
-  analyzer: "^0.27.3"
+  analyzer: ">=0.27.3 <2.0.0"
   browser: any
-  mockito: "^0.10.0"
-  coverage: "^0.7.2"
-  dart_dev: "^1.0.0"
-  dart_style: "^0.2.1"
-  test: "^0.12.3+5"
+  mockito: ">=0.10.0 <2.0.0"
+  coverage: ">=0.7.2 <2.0.0"
+  dart_dev: ">=1.0.0 <2.0.0"
+  dart_style: ">=0.2.1 <2.0.0"
+  test: ">=0.12.3+5 <2.0.0"
 environment:
   sdk: ">=1.9.0 <2.0.0"
