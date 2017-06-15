@@ -15,7 +15,7 @@ class MockWindow extends Mock implements Window {
   // location is not strong mode compatible, but given the difficulties of
   // mocking window location and since this is in tests and not deployed code
   // it is excluded from strong mode analysis
-  MockLocation location; 
+  MockLocation location;
   MockDocument document;
 
   StreamController _onHashChangeController;
