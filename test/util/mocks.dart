@@ -12,7 +12,9 @@ import 'package:route_hierarchical/client.dart';
 
 class MockWindow extends Mock implements Window {
   MockHistory history;
-  MockLocation location;
+  MockLocation _location;
+  MockLocation get location => _location;
+  void set location(LocationBase lb) => _location = lb;
   MockDocument document;
 
   StreamController _onHashChangeController;
