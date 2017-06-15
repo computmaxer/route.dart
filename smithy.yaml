@@ -1,11 +1,16 @@
 project: dart
 language: dart
 
-# dart 1.19.1, built from https://github.com/Workiva/smithy-runner-dart/tree/0.0.4
-runner_image: drydock-prod.workiva.org/workiva/smithy-runner-dart:74173
+# Dart 1.24
+runner_image: drydock-prod.workiva.net/workiva/smithy-runner-generator:174309
 
 script:
   - pub get
+  - pub run dart_dev format --check
+  - pub run dart_dev analyze
+  - pub run dart_dev test
+  - pub run dart_dev coverage --no-html
+  - bash <(curl -s https://codecov.io/bash) -f coverage/coverage.lcov
 
 artifacts:
   build:
