@@ -28,7 +28,7 @@ main(List<String> args) async {
 
   config.test
     ..concurrency = 1
-    ..platforms = ['chrome']
+    ..platforms = ['content-shell']
     ..unitTests = ['test/all_web_tests.dart'];
 
   await dev(args);
