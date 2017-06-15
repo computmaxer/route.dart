@@ -23,7 +23,7 @@ main(List<String> args) async {
   List<String> dirs = ['example/', 'lib/', 'test/', 'tool/'];
   config.analyze
     ..entryPoints = dirs
-    ..fatalWarnings=false;
+    ..fatalWarnings = false;
   config.format.directories = dirs;
 
   config.test
