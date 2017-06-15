@@ -2,8 +2,8 @@ language: dart
 dart:
   - 1.23.0
 dart_task:
-  - test: --platform vm
-  - test: --platform dartium
+- test: --platform vm
+- test: --platform dartium
   install_dartium: true
 before_install:
   - export DISPLAY=:99.0
