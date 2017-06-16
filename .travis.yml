@@ -1,10 +1,7 @@
 language: dart
 dart:
   - 1.23.0
-with_content_shell: true
-before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
+install_dartium: true
 script:
   - pub run dart_dev format --check
   - pub run dart_dev analyze
