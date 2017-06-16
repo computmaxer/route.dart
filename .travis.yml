@@ -1,7 +1,6 @@
 language: dart
 dart:
   - 1.23.0
-install_dartium: true
 script:
   - pub run dart_dev format --check
   - pub run dart_dev analyze
