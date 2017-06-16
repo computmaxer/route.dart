@@ -1,9 +1,8 @@
-Route
+Route Hierarchical
 =====
 [![Build Status](https://travis-ci.org/Workiva/route.dart.svg?branch=master)](https://travis-ci.org/Workiva/route.dart) [![codecov.io](http://codecov.io/github/Workiva/route.dart/coverage.svg?branch=master)](http://codecov.io/github/Workiva/route.dart?branch=master)
 
-Route is a client routing library for Dart that helps make building
-single-page web apps.
+Route Hierarchical is a client-side routing library for Dart single-page web apps. This router supports a hierarchical tree of routes and provides methods for handling specified URL paths, listening to web browser history events, and creating HTML event handlers that navigate to a URL.
 
 Installation
 ------------
@@ -13,36 +12,25 @@ Add this package to your pubspec.yaml file:
     dependencies:
       route_hierarchical: any
 
-Then, run `pub install` to download and link in the package.
+Then, run `pub get` to download the package.
 
 UrlMatcher
 ----------
-Route is built around `UrlMatcher`, an interface that defines URL template
-parsing, matching and reversing.
-
+Route Hierarchical is built around `UrlMatcher`, an interface that defines URL template parsing, matching and reversing.
 
 UrlTemplate
 -----------
-The default implementation of the `UrlMatcher` is `UrlTemplate`. As an example,
-consider a blog with a home page and an article page. The article URL has the
-form /article/1234. It can matched by the following template:
-`/article/:articleId`.
+The default implementation of the `UrlMatcher` is `UrlTemplate`. `UrlTemplate` supports both static and parameterized route segments. For example, a URL of the form `/article/1234` can be matched by the template `/article/:articleId` to activate an `article` route with an `articleId` parameter value of `1234`.
 
 Router
 --------------
+Router is a stateful object that contains routes and can perform URL routing operations on those routes.
 
-Router is a stateful object that contains routes and can perform URL routing
-on those routes.
+The `Router` can listen to web browser history events and invoke the correct handlers so that the browser's back and forward buttons work seamlessly.
 
-The `Router` can listen to `Window.onPopState` (or fallback to
-Window.onHashChange in older browsers) events and invoke the correct
-handler so that the back button seamlessly works.
-
-Example (client.dart):
+Example Usage:
 
 ```dart
-library client;
-
 import 'package:route_hierarchical/client.dart';
 
 main() {
@@ -54,17 +42,19 @@ main() {
 }
 
 void showHome(RouteEvent e) {
-  // nothing to parse from path, since there are no groups
+  // Display the Home page
+  // (there is no data to parse from this path)
 }
 
 void showArticle(RouteEvent e) {
+  // Display an Article page
   var articleId = e.parameters['articleId'];
-  // show article page with loading indicator
-  // load article from server, then render article
+  // Show article page with loading indicator
+  // Load article from server, then render article
 }
 ```
 
-The client side router can let you define nested routes.
+`Router` supports nested routes:
 
 ```dart
 var router = new Router();
@@ -100,21 +90,16 @@ router.root
                      enter: editArticle)))
 ```
 
-The mount parameter takes either a function that accepts an instance of a new
+The `mount` parameter accepts either a function that accepts an instance of a new
 child router as the only parameter, or an instance of an object that implements
 Routable interface.
 
-```dart
-typedef void MountFn(Router router);
-```
 
-or
+  /// An additional level of child nodes can be [mount]ed as children of this
+  /// new [Route] by supplying a [Routable] object, a [RoutableFactory], or a
+  /// simple [Function](Route router).
 
-```dart
-abstract class Routable {
-  void configureRoute(Route router);
-}
-```
+
 
 In either case, the child router is instantiated by the parent router an
 injected into the mount point, at which point child router can be configured
