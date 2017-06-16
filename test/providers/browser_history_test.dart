@@ -405,7 +405,8 @@ main() {
           var router = new Router(
               historyProvider: new BrowserHistory(windowImpl: mockWindow));
           router.root.addRoute(name: 'hello', path: '/hello');
-          router.onRouteStart.listen(expectAsync((RouteStartEvent start) async {
+          router.onRouteStart
+              .listen(expectAsync1((RouteStartEvent start) async {
             await start.completed;
             expect(router.findRoute('hello').isActive, isTrue);
             expect(router.findRoute('hello').queryParameters['baz'], 'bat');
@@ -487,7 +488,7 @@ main() {
                 })
             ..addRoute(name: 'bar', path: '/bar');
 
-          fallbackCompleter.future.then(expectAsync((_) {}, count: 1));
+          fallbackCompleter.future.then(expectAsync1((_) {}, count: 1));
           router.listen();
         });
       });

@@ -24,7 +24,7 @@ main(List<String> args) async {
   config.analyze
     ..entryPoints = dirs
     ..fatalWarnings = false;
-  config.format.directories = dirs;
+  config.format.paths = dirs;
 
   config.test
     ..concurrency = 1
