@@ -9,8 +9,10 @@ main() {
     test('toString should return stringified url pattern', () {
       var tmpl = new UrlTemplate('/foo/bar:baz/aux');
       expect(tmpl.urlParameterNames, equals(['baz']));
-      expect(tmpl.toString(),
-          equals('UrlTemplate(RegExp: pattern=^/foo/bar([^/?]+)/aux flags=)'));
+      expect(
+          tmpl.toString(),
+          allOf(startsWith('UrlTemplate('), contains('^/foo/bar([^/?]+)/aux'),
+              endsWith(')')));
     });
 
     test('should work with simple templates', () {

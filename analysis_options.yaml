@@ -1,7 +1,5 @@
 analyzer:
   strong-mode: true
-  exclude:
-    - test/util/mocks.dart
 
 linter:
   rules:

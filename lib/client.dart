@@ -557,7 +557,8 @@ class Router {
       trimmedActivePath = activePath;
     } else {
       baseRoute = _dehandle(startingFrom);
-      trimmedActivePath = activePath.sublist(activePath.indexOf(baseRoute) + 1);
+      trimmedActivePath =
+          activePath.sublist(activePath.indexOf(baseRoute) + 1).toList();
     }
     var treePath = _matchingTreePath(path, baseRoute);
 
@@ -630,14 +631,14 @@ class Router {
           (treePath[i].route.dontLeaveOnParamChanges ||
               !(forceReload ||
                   _paramsChanged(treePath[i].route, treePath[i])))) {
-        mustLeave = mustLeave.skip(1);
+        mustLeave = mustLeave.skip(1).toList();
         leaveBase = leaveBase._currentRoute;
       } else {
         break;
       }
     }
     // Reverse the list to ensure child is left before the parent.
-    mustLeave = mustLeave.toList().reversed;
+    mustLeave = mustLeave.toList().reversed.toList();
 
     var preLeaving = <Future<bool>>[];
     mustLeave.forEach((toLeave) {
@@ -687,7 +688,7 @@ class Router {
       if (toEnter.first.route == activePath[i] &&
           !(forceReload || _paramsChanged(activePath[i], treePath[i]))) {
         tail = treePath[i].urlMatch.tail;
-        toEnter = toEnter.skip(1);
+        toEnter = toEnter.skip(1).toList();
         enterBase = enterBase._currentRoute;
       } else {
         break;
@@ -897,7 +898,7 @@ class Router {
 
   /// Parse the query string to a parameter `Map`
   Map<String, String> _parseQuery(Route route, String path) {
-    var params = {};
+    var params = <String,String>{};
     if (path.indexOf('?') == -1) return params;
     var queryStr = path.substring(path.indexOf('?') + 1);
     queryStr.split('&').forEach((String keyValPair) {

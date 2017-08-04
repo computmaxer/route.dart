@@ -14,7 +14,7 @@
 
 library tool.dev;
 
-import 'package:dart_dev/dart_dev.dart' show dev, config;
+import 'package:dart_dev/dart_dev.dart' show dev, config, TestRunnerConfig;
 
 main(List<String> args) async {
   // https://github.com/Workiva/dart_dev
@@ -29,7 +29,15 @@ main(List<String> args) async {
   config.test
     ..concurrency = 1
     ..platforms = ['content-shell']
-    ..unitTests = ['test/all_web_tests.dart'];
+    ..unitTests = ['test/all_routes_test.dart']
+    ..pubServe = true;
+
+  config.genTestRunner.configs = [
+    new TestRunnerConfig(
+      filename: 'all_routes_test',
+      genHtml: true,
+    )
+  ];
 
   await dev(args);
 }
