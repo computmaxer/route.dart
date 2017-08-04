@@ -571,7 +571,7 @@ commonProviderTests(RouterFactory routerFactory) {
 
   group('leave', () {
     test('should leave previous route and enter new', () async {
-      var counters = <String, int>{
+      final counters = <String, int>{
         'fooPreEnter': 0,
         'fooPreLeave': 0,
         'fooEnter': 0,
@@ -675,7 +675,7 @@ commonProviderTests(RouterFactory routerFactory) {
     });
 
     test('should leave starting from child to parent', () async {
-      var log = [];
+      List<String> log = <String>[];
       void loggingLeaveHandler(RouteLeaveEvent r) {
         log.add(r.route.name);
       }
@@ -718,7 +718,7 @@ commonProviderTests(RouterFactory routerFactory) {
     });
 
     Future<bool> _testAllowLeave(bool allowLeave) {
-      var completer = new Completer<bool>();
+      final completer = new Completer<bool>();
       bool barEntered = false;
       bool bazEntered = false;
 
@@ -761,7 +761,7 @@ commonProviderTests(RouterFactory routerFactory) {
 
   group('preEnter', () {
     Future<bool> _testAllowEnter(bool allowEnter) {
-      var completer = new Completer<bool>();
+      final completer = new Completer<bool>();
       bool barEntered = false;
 
       router.root
@@ -796,7 +796,7 @@ commonProviderTests(RouterFactory routerFactory) {
     test(
         'should leave on parameters changes when dontLeaveOnParamChanges is false (default)',
         () async {
-      var counters = <String, int>{
+      final counters = <String, int>{
         'fooPreEnter': 0,
         'fooPreLeave': 0,
         'fooEnter': 0,
@@ -887,7 +887,7 @@ commonProviderTests(RouterFactory routerFactory) {
     test(
         'should not leave on parameter changes when dontLeaveOnParamChanges is true',
         () async {
-      var counters = <String, int>{
+      final counters = <String, int>{
         'fooPreEnter': 0,
         'fooPreLeave': 0,
         'fooEnter': 0,
@@ -975,7 +975,7 @@ commonProviderTests(RouterFactory routerFactory) {
     });
 
     test('should not leave leaving when on preEnter fails', () async {
-      var counters = <String, int>{
+      final counters = <String, int>{
         'fooPreEnter': 0,
         'fooPreLeave': 0,
         'fooEnter': 0,
@@ -1084,7 +1084,7 @@ commonProviderTests(RouterFactory routerFactory) {
     });
 
     test('should follow default routes', () async {
-      var counters = <String, int>{
+      final counters = <String, int>{
         'list_entered': 0,
         'article_123_entered': 0,
         'article_123_view_entered': 0,
@@ -1151,7 +1151,7 @@ commonProviderTests(RouterFactory routerFactory) {
 
     test('should follow first defined default routes if multiple exist',
         () async {
-      var counters = <String, int>{
+      final counters = <String, int>{
         'list_entered': 0,
         'article_123_entered': 0,
         'article_123_view_entered': 0,
@@ -1221,7 +1221,7 @@ commonProviderTests(RouterFactory routerFactory) {
     test(
         'should follow first defined default routes if multiple exist (with reversed defaults)',
         () async {
-      var counters = <String, int>{
+      final counters = <String, int>{
         'list_entered': 0,
         'article_123_entered': 0,
         'article_123_view_entered': 0,
@@ -1347,7 +1347,7 @@ commonProviderTests(RouterFactory routerFactory) {
       });
 
       test('should not reload when unwatched query param changes', () async {
-        var counters = {
+        final counters = {
           'fooLeave': 0,
           'fooEnter': 0,
         };
@@ -1372,7 +1372,7 @@ commonProviderTests(RouterFactory routerFactory) {
       });
 
       test('should reload when watched query param changes', () async {
-        var counters = {
+        final counters = {
           'fooLeave': 0,
           'fooEnter': 0,
         };
@@ -1397,7 +1397,7 @@ commonProviderTests(RouterFactory routerFactory) {
       });
 
       test('should match pattern for watched query params', () async {
-        var counters = {
+        final counters = {
           'fooLeave': 0,
           'fooEnter': 0,
         };
@@ -1545,7 +1545,7 @@ commonProviderTests(RouterFactory routerFactory) {
                     ..addRoute(
                         name: 'aux', path: '/aux', mount: (child) => child)));
 
-      var strPath =
+      final strPath =
           (List<Route> path) => path.map((Route r) => r.name).join('.');
 
       expect(strPath(router.activePath), '');

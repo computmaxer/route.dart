@@ -7,7 +7,7 @@ import 'package:route_hierarchical/url_matcher.dart';
 main() {
   group('UrlTemplate', () {
     test('toString should return stringified url pattern', () {
-      var tmpl = new UrlTemplate('/foo/bar:baz/aux');
+      final tmpl = new UrlTemplate('/foo/bar:baz/aux');
       expect(tmpl.urlParameterNames, equals(['baz']));
       expect(
           tmpl.toString(),
@@ -16,7 +16,7 @@ main() {
     });
 
     test('should work with simple templates', () {
-      var tmpl = new UrlTemplate('/foo/bar:baz/aux');
+      UrlTemplate tmpl = new UrlTemplate('/foo/bar:baz/aux');
       expect(tmpl.urlParameterNames, equals(['baz']));
       expect(tmpl.match('/foo/bar123/aux'),
           new UrlMatch('/foo/bar123/aux', '', {'baz': '123'}));
@@ -50,7 +50,7 @@ main() {
     });
 
     test('should work with special characters', () {
-      var tmpl = new UrlTemplate(r'\^\|+[]{}()');
+      UrlTemplate tmpl = new UrlTemplate(r'\^\|+[]{}()');
       expect(tmpl.match(r'\^\|+[]{}()'), new UrlMatch(r'\^\|+[]{}()', '', {}));
 
       tmpl = new UrlTemplate(r'/:foo/^\|+[]{}()');
@@ -60,18 +60,18 @@ main() {
     });
 
     test('should only match prefix', () {
-      var tmpl = new UrlTemplate(r'/foo');
+      final tmpl = new UrlTemplate(r'/foo');
       expect(
           tmpl.match(r'/foo/foo/bar'), new UrlMatch(r'/foo', '/foo/bar', {}));
     });
 
     test('should match without leading slashes', () {
-      var tmpl = new UrlTemplate(r'foo');
+      final tmpl = new UrlTemplate(r'foo');
       expect(tmpl.match(r'foo'), new UrlMatch(r'foo', '', {}));
     });
 
     test('should reverse', () {
-      var tmpl = new UrlTemplate('/:a/:b/:c');
+      UrlTemplate tmpl = new UrlTemplate('/:a/:b/:c');
       expect(tmpl.urlParameterNames, equals(['a', 'b', 'c']));
       expect(tmpl.reverse(), '/null/null/null');
       expect(tmpl.reverse(parameters: {'a': 'foo', 'b': 'bar', 'c': 'baz'}),
@@ -105,7 +105,7 @@ main() {
     });
 
     test('should conditionally allow slashes in parameters', () {
-      var tmpl = new UrlTemplate('/foo/:bar');
+      UrlTemplate tmpl = new UrlTemplate('/foo/:bar');
       expect(tmpl.urlParameterNames, equals(['bar']));
       expect(tmpl.match('/foo/123/456'),
           new UrlMatch('/foo/123', '/456', {'bar': '123'}));

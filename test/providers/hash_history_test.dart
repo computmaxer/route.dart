@@ -50,7 +50,7 @@ main() {
       test('should encode query parameters in the URL', () async {
         router.root.addRoute(name: 'articles', path: '/articles');
 
-        var queryParams = {'foo': 'foo bar', 'bar': '%baz+aux'};
+        final queryParams = {'foo': 'foo bar', 'bar': '%baz+aux'};
         await router.go('articles', {}, queryParameters: queryParams);
         expect(mockWindow.history.urlList.length, equals(1));
         expect(mockWindow.history.urlList.last,
@@ -64,7 +64,7 @@ main() {
               path: '/:foo',
               mount: (child) => child..addRoute(name: 'b', path: '/:bar'));
 
-        var routeA = router.root.findRoute('a');
+        final routeA = router.root.findRoute('a');
 
         await router.go('a.b', {});
         expect(mockWindow.history.urlList.length, equals(1));
@@ -80,7 +80,7 @@ main() {
       });
 
       test('should attempt to reverse default routes', () async {
-        var counters = <String, int>{'aEnter': 0, 'bEnter': 0};
+        final counters = <String, int>{'aEnter': 0, 'bEnter': 0};
         router.root
           ..addRoute(
               name: 'a',
@@ -99,14 +99,14 @@ main() {
         await router.route('');
         expect(counters, {'aEnter': 1, 'bEnter': 1});
 
-        var routeA = router.root.findRoute('a');
+        final routeA = router.root.findRoute('a');
         await router.go('b', {'bar': 'bbb'}, startingFrom: routeA);
         expect(mockWindow.history.urlList.length, equals(1));
         expect(mockWindow.history.urlList.last, equals('#/null/bbb'));
       });
 
       test('should force reload already active routes', () async {
-        var counters = <String, int>{'aEnter': 0, 'bEnter': 0};
+        final counters = <String, int>{'aEnter': 0, 'bEnter': 0};
         router.root
           ..addRoute(
               name: 'a',
@@ -275,8 +275,8 @@ main() {
 
     group('url', () {
       test('should reconstruct url', () async {
-        var mockWindow = new MockWindow();
-        var router = new Router(
+        final mockWindow = new MockWindow();
+        final router = new Router(
             historyProvider: new HashHistory(windowImpl: mockWindow));
         router.root
           ..addRoute(
@@ -286,7 +286,7 @@ main() {
               mount: (child) => child
                 ..addRoute(name: 'b', defaultRoute: true, path: '/:bar'));
 
-        var routeA = router.root.findRoute('a');
+        final routeA = router.root.findRoute('a');
 
         await router.route('');
         expect(router.url('a.b'), '#/null/null');
@@ -344,7 +344,7 @@ main() {
                       ..addRoute(
                           name: 'aux', path: '/aux', mount: (child) => child)));
 
-        var strPath =
+        final strPath =
             (List<Route> path) => path.map((Route r) => r.name).join('.');
 
         expect(strPath(router.activePath), '');
@@ -352,7 +352,7 @@ main() {
         await router.route('/foo');
         expect(strPath(router.activePath), 'foo');
 
-        var foo = router.findRoute('foo');
+        final foo = router.findRoute('foo');
         await router.go('bar', {}, startingFrom: foo);
         expect(strPath(router.activePath), 'foo.bar');
       });
@@ -378,7 +378,7 @@ main() {
                       ..addRoute(
                           name: 'aux', path: '/aux', mount: (child) => child)));
 
-        var strPath =
+        final strPath =
             (List<Route> path) => path.map((Route r) => r.name).join('.');
 
         expect(strPath(router.activePath), '');
@@ -386,7 +386,7 @@ main() {
         await router.route('/foo/qux/aux');
         expect(strPath(router.activePath), 'foo.qux.aux');
 
-        var foo = router.findRoute('foo');
+        final foo = router.findRoute('foo');
         await router.go('bar', {}, startingFrom: foo);
         expect(strPath(router.activePath), 'foo.bar');
       });
@@ -395,9 +395,9 @@ main() {
     group('listen', () {
       group('fragment', () {
         test('should route current hash on listen', () {
-          var mockWindow = new MockWindow();
+          final mockWindow = new MockWindow();
           when(mockWindow.location.hash).thenReturn('#/foo');
-          var router = new Router(
+          final router = new Router(
               historyProvider: new HashHistory(windowImpl: mockWindow));
           router.root.addRoute(name: 'foo', path: '/foo');
           router.onRouteStart
@@ -409,8 +409,8 @@ main() {
         });
 
         test('should process url changes for route rejection', () async {
-          var mockWindow = new MockWindow();
-          var router = new Router(
+          final mockWindow = new MockWindow();
+          final router = new Router(
               historyProvider: new HashHistory(windowImpl: mockWindow));
           router.root
             ..addRoute(

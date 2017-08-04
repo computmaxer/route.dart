@@ -253,9 +253,10 @@ class RouteImpl extends Route {
       throw new ArgumentError('pageTitle must be a String or PageTitleHandler');
     }
 
-    var matcher = path is UrlMatcher ? path : new UrlTemplate(path.toString());
+    final matcher =
+        path is UrlMatcher ? path : new UrlTemplate(path.toString());
 
-    var route = new RouteImpl._new(
+    final route = new RouteImpl._new(
         name: name,
         path: matcher,
         parent: this,
@@ -300,7 +301,8 @@ class RouteImpl extends Route {
       throw new ArgumentError('redirect must specify an existing route name');
     }
 
-    var matcher = path is UrlMatcher ? path : new UrlTemplate(path.toString());
+    final matcher =
+        path is UrlMatcher ? path : new UrlTemplate(path.toString());
     _routes[toRoute].redirects.add(matcher);
   }
 
@@ -309,7 +311,7 @@ class RouteImpl extends Route {
     RouteImpl currentRoute = this;
     List<String> subRouteNames = routePath.split(_PATH_SEPARATOR);
     while (subRouteNames.isNotEmpty) {
-      var routeName = subRouteNames.removeAt(0);
+      final routeName = subRouteNames.removeAt(0);
       currentRoute = currentRoute._routes[routeName];
       if (currentRoute == null) {
         _logger.warning('Invalid route name: $routeName $_routes');
@@ -321,7 +323,7 @@ class RouteImpl extends Route {
 
   String _getHead(String tail) {
     for (RouteImpl route = this; route.parent != null; route = route.parent) {
-      var currentRoute = route.parent._currentRoute;
+      final currentRoute = route.parent._currentRoute;
       if (currentRoute == null) {
         throw new StateError(
             'Route ${route.parent.name} has no current route.');
@@ -333,7 +335,7 @@ class RouteImpl extends Route {
   }
 
   String _getTailUrl(Route routeToGo, Map parameters) {
-    var tail = '';
+    String tail = '';
     for (RouteImpl route = routeToGo; route != this; route = route.parent) {
       tail = route.path.reverse(
           parameters: _joinParams(
@@ -550,8 +552,8 @@ class Router {
       {Route startingFrom, bool forceReload: false}) {
     _logger.finest('route path=$path startingFrom=$startingFrom '
         'forceReload=$forceReload');
-    var baseRoute;
-    var trimmedActivePath;
+    RouteImpl baseRoute;
+    List<RouteImpl> trimmedActivePath;
     if (startingFrom == null) {
       baseRoute = root;
       trimmedActivePath = activePath;
@@ -560,10 +562,10 @@ class Router {
       trimmedActivePath =
           activePath.sublist(activePath.indexOf(baseRoute) + 1).toList();
     }
-    var treePath = _matchingTreePath(path, baseRoute);
+    final treePath = _matchingTreePath(path, baseRoute);
 
     // Figure out the list of routes that will be left
-    var future =
+    final future =
         _preLeave(path, treePath, trimmedActivePath, baseRoute, forceReload)
             .then((success) {
       // if the route change was successful, change the pageTitle
@@ -624,9 +626,9 @@ class Router {
    */
   Future<bool> _preLeave(String path, List<_Match> treePath,
       List<RouteImpl> activePath, RouteImpl baseRoute, bool forceReload) {
-    var mustLeave = activePath;
-    var leaveBase = baseRoute;
-    for (var i = 0, ll = min(activePath.length, treePath.length); i < ll; i++) {
+    List<RouteImpl> mustLeave = activePath;
+    RouteImpl leaveBase = baseRoute;
+    for (int i = 0, ll = min(activePath.length, treePath.length); i < ll; i++) {
       if (mustLeave.first == treePath[i].route &&
           (treePath[i].route.dontLeaveOnParamChanges ||
               !(forceReload ||
@@ -640,16 +642,16 @@ class Router {
     // Reverse the list to ensure child is left before the parent.
     mustLeave = mustLeave.toList().reversed.toList();
 
-    var preLeaving = <Future<bool>>[];
+    List<Future<bool>> preLeaving = <Future<bool>>[];
     mustLeave.forEach((toLeave) {
-      var event = new RoutePreLeaveEvent(toLeave);
+      final event = new RoutePreLeaveEvent(toLeave);
       toLeave._onPreLeaveController.add(event);
       preLeaving.addAll(event._allowLeaveFutures);
     });
 
     return Future.wait(preLeaving).then((List<bool> results) {
       if (!results.any((r) => r == false)) {
-        var leaveFn = () => _leave(mustLeave, leaveBase);
+        final leaveFn = () => _leave(mustLeave, leaveBase);
         return _preEnter(
             path, treePath, activePath, baseRoute, leaveFn, forceReload);
       }
@@ -659,7 +661,7 @@ class Router {
 
   void _leave(Iterable<RouteImpl> mustLeave, Route leaveBase) {
     mustLeave.forEach((toLeave) {
-      var event = new RouteLeaveEvent(toLeave);
+      final event = new RouteLeaveEvent(toLeave);
       toLeave._onLeaveController.add(event);
     });
     if (!mustLeave.isEmpty) {
@@ -681,10 +683,10 @@ class Router {
       RouteImpl baseRoute,
       Function leaveFn,
       bool forceReload) {
-    var toEnter = treePath;
-    var tail = path;
-    var enterBase = baseRoute;
-    for (var i = 0, ll = min(toEnter.length, activePath.length); i < ll; i++) {
+    List<_Match> toEnter = treePath;
+    String tail = path;
+    RouteImpl enterBase = baseRoute;
+    for (int i = 0, ll = min(toEnter.length, activePath.length); i < ll; i++) {
       if (toEnter.first.route == activePath[i] &&
           !(forceReload || _paramsChanged(activePath[i], treePath[i]))) {
         tail = treePath[i].urlMatch.tail;
@@ -711,9 +713,9 @@ class Router {
       });
     }
 
-    var preEnterFutures = <Future<bool>>[];
+    List<Future<bool>> preEnterFutures = <Future<bool>>[];
     toEnter.forEach((_Match matchedRoute) {
-      var preEnterEvent = new RoutePreEnterEvent._fromMatch(matchedRoute);
+      final preEnterEvent = new RoutePreEnterEvent._fromMatch(matchedRoute);
       matchedRoute.route._onPreEnterController.add(preEnterEvent);
       preEnterFutures.addAll(preEnterEvent._allowEnterFutures);
     });
@@ -728,9 +730,9 @@ class Router {
   }
 
   void _enter(RouteImpl startingFrom, Iterable<_Match> treePath, String path) {
-    var base = startingFrom;
+    RouteImpl base = startingFrom;
     treePath.forEach((_Match matchedRoute) {
-      var event = new RouteEnterEvent._fromMatch(matchedRoute);
+      final event = new RouteEnterEvent._fromMatch(matchedRoute);
       base._currentRoute = matchedRoute.route;
       base._currentRoute._lastEvent = event;
       matchedRoute.route._onEnterController.add(event);
@@ -792,7 +794,7 @@ class Router {
   }
 
   bool _paramsChanged(RouteImpl route, _Match match) {
-    var lastEvent = route._lastEvent;
+    final lastEvent = route._lastEvent;
     return lastEvent == null ||
         lastEvent.path != match.urlMatch.match ||
         !mapsShallowEqual(lastEvent.parameters, match.urlMatch.parameters) ||
@@ -819,7 +821,7 @@ class Router {
   }
 
   Future<bool> reload({Route startingFrom}) {
-    var path = activePath;
+    List<RouteImpl> path = activePath;
     RouteImpl baseRoute = startingFrom == null ? root : _dehandle(startingFrom);
     if (baseRoute != root) {
       path = path.skipWhile((r) => r != baseRoute).skip(1).toList();
@@ -839,8 +841,8 @@ class Router {
       Map queryParameters,
       bool forceReload: false}) {
     RouteImpl baseRoute = startingFrom == null ? root : _dehandle(startingFrom);
-    var routeToGo = _findRoute(baseRoute, routePath);
-    var newTail = baseRoute._getTailUrl(routeToGo, parameters) +
+    final routeToGo = _findRoute(baseRoute, routePath);
+    final newTail = baseRoute._getTailUrl(routeToGo, parameters) +
         _buildQuery(queryParameters);
     String newUrl = baseRoute._getHead(newTail);
     _logger.finest('go $newUrl');
@@ -863,8 +865,8 @@ class Router {
       {Route startingFrom, Map parameters, Map queryParameters}) {
     RouteImpl baseRoute = startingFrom == null ? root : _dehandle(startingFrom);
     parameters = parameters == null ? {} : parameters;
-    var routeToGo = _findRoute(baseRoute, routePath);
-    var tail = baseRoute._getTailUrl(routeToGo, parameters);
+    final routeToGo = _findRoute(baseRoute, routePath);
+    final tail = baseRoute._getTailUrl(routeToGo, parameters);
     return normalizeUrl(
         baseRoute._getHead(tail) + _buildQuery(queryParameters));
   }
@@ -876,7 +878,7 @@ class Router {
   /// Attempts to find [Route] for the specified [routePath] relative to the
   /// [baseRoute]. If nothing is found throws a [StateError].
   Route _findRoute(Route baseRoute, String routePath) {
-    var route = baseRoute.findRoute(routePath);
+    final route = baseRoute.findRoute(routePath);
     if (route == null) {
       throw new StateError('Invalid route path: $routePath');
     }
@@ -898,12 +900,12 @@ class Router {
 
   /// Parse the query string to a parameter `Map`
   Map<String, String> _parseQuery(Route route, String path) {
-    var params = <String,String>{};
+    Map<String, String> params = <String, String>{};
     if (path.indexOf('?') == -1) return params;
-    var queryStr = path.substring(path.indexOf('?') + 1);
+    final queryStr = path.substring(path.indexOf('?') + 1);
     queryStr.split('&').forEach((String keyValPair) {
       List<String> keyVal = _parseKeyVal(keyValPair);
-      var key = keyVal[0];
+      final key = keyVal[0];
       if (key.isNotEmpty) {
         params[key] = Uri.decodeComponent(keyVal[1]);
       }
@@ -919,7 +921,7 @@ class Router {
     if (kvPair.isEmpty) {
       return const ['', ''];
     }
-    var splitPoint = kvPair.indexOf('=');
+    final splitPoint = kvPair.indexOf('=');
 
     return (splitPoint == -1)
         ? [kvPair, '']
@@ -995,8 +997,8 @@ class Router {
    * Excludes the root path.
    */
   List<RouteImpl> get activePath {
-    var res = <RouteImpl>[];
-    var route = root;
+    final res = <RouteImpl>[];
+    RouteImpl route = root;
 
     while (route._currentRoute != null) {
       route = route._currentRoute;

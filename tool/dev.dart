@@ -29,12 +29,12 @@ main(List<String> args) async {
   config.test
     ..concurrency = 1
     ..platforms = ['content-shell']
-    ..unitTests = ['test/all_routes_test.dart']
+    ..unitTests = ['test/all_web_tests.dart']
     ..pubServe = true;
 
   config.genTestRunner.configs = [
     new TestRunnerConfig(
-      filename: 'all_routes_test',
+      filename: 'all_web_tests',
       genHtml: true,
     )
   ];

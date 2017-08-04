@@ -20,7 +20,7 @@ environment:
   sdk: ">=1.9.0 <2.0.0"
 transformers:
   - test/pub_serve:
-      $include: test/**_test{.*,}.dart
+      $include: test/**_test{s*,}{.*,}.dart
 web:
   compiler:
     debug: dartdevc

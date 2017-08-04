@@ -47,7 +47,7 @@ main() {
       test('should encode query parameters in the URL', () async {
         router.root.addRoute(name: 'articles', path: '/articles');
 
-        var queryParams = {'foo': 'foo bar', 'bar': '%baz+aux'};
+        final queryParams = {'foo': 'foo bar', 'bar': '%baz+aux'};
         await router.go('articles', {}, queryParameters: queryParams);
         expect(urlHistory,
             equals(['', '/articles?foo=foo%20bar&bar=%25baz%2Baux']));
@@ -60,7 +60,7 @@ main() {
               path: '/:foo',
               mount: (child) => child..addRoute(name: 'b', path: '/:bar'));
 
-        var routeA = router.root.findRoute('a');
+        final routeA = router.root.findRoute('a');
 
         await router.go('a.b', {});
         expect(urlHistory, equals(['', '/null/null']));
@@ -74,7 +74,7 @@ main() {
       });
 
       test('should attempt to reverse default routes', () async {
-        var counters = <String, int>{'aEnter': 0, 'bEnter': 0};
+        final counters = <String, int>{'aEnter': 0, 'bEnter': 0};
         router.root
           ..addRoute(
               name: 'a',
@@ -93,13 +93,13 @@ main() {
         await router.route('');
         expect(counters, {'aEnter': 1, 'bEnter': 1});
 
-        var routeA = router.root.findRoute('a');
+        final routeA = router.root.findRoute('a');
         await router.go('b', {'bar': 'bbb'}, startingFrom: routeA);
         expect(urlHistory, equals(['', '/null/bbb']));
       });
 
       test('should force reload already active routes', () async {
-        var counters = <String, int>{'aEnter': 0, 'bEnter': 0};
+        final counters = <String, int>{'aEnter': 0, 'bEnter': 0};
         router.root
           ..addRoute(
               name: 'a',
@@ -258,7 +258,7 @@ main() {
 
     group('url', () {
       test('should reconstruct url', () async {
-        var router = new Router(historyProvider: new MemoryHistory());
+        final router = new Router(historyProvider: new MemoryHistory());
         router.root
           ..addRoute(
               name: 'a',
@@ -267,7 +267,7 @@ main() {
               mount: (child) => child
                 ..addRoute(name: 'b', defaultRoute: true, path: '/:bar'));
 
-        var routeA = router.root.findRoute('a');
+        final routeA = router.root.findRoute('a');
 
         await router.route('');
         expect(router.url('a.b'), router.normalizeUrl('/null/null'));
@@ -324,7 +324,7 @@ main() {
                       ..addRoute(
                           name: 'aux', path: '/aux', mount: (child) => child)));
 
-        var strPath =
+        final strPath =
             (List<Route> path) => path.map((Route r) => r.name).join('.');
 
         expect(strPath(router.activePath), '');
@@ -332,7 +332,7 @@ main() {
         await router.route('/foo');
         expect(strPath(router.activePath), 'foo');
 
-        var foo = router.findRoute('foo');
+        final foo = router.findRoute('foo');
         await router.go('bar', {}, startingFrom: foo);
         expect(strPath(router.activePath), 'foo.bar');
       });
@@ -358,7 +358,7 @@ main() {
                       ..addRoute(
                           name: 'aux', path: '/aux', mount: (child) => child)));
 
-        var strPath =
+        final strPath =
             (List<Route> path) => path.map((Route r) => r.name).join('.');
 
         expect(strPath(router.activePath), '');
@@ -366,7 +366,7 @@ main() {
         await router.route('/foo/qux/aux');
         expect(strPath(router.activePath), 'foo.qux.aux');
 
-        var foo = router.findRoute('foo');
+        final foo = router.findRoute('foo');
         await router.go('bar', {}, startingFrom: foo);
         expect(strPath(router.activePath), 'foo.bar');
       });
@@ -473,7 +473,7 @@ main() {
     test('should support history.back', () async {
       List<String> urlHistory = [''];
       MemoryHistory memHistory = new MemoryHistory(urlHistory: urlHistory);
-      var router = new Router(historyProvider: memHistory);
+      final router = new Router(historyProvider: memHistory);
       router.root
         ..addRoute(name: 'foo', path: '/foo')
         ..addRoute(name: 'bar', path: '/bar');

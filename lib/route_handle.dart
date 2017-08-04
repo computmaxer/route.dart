@@ -88,7 +88,7 @@ class RouteHandle implements Route {
   Route findRoute(String routePath) {
     Route r = _assertState(() => _getHost(_route).findRoute(routePath));
     if (r == null) return null;
-    var handle = r.newHandle();
+    RouteHandle handle = r.newHandle();
     if (handle != null) _childHandles.add(handle);
     return handle;
   }

@@ -51,7 +51,7 @@ main() {
       test('should encode query parameters in the URL', () async {
         router.root.addRoute(name: 'articles', path: '/articles');
 
-        var queryParams = {'foo': 'foo bar', 'bar': '%baz+aux'};
+        final queryParams = {'foo': 'foo bar', 'bar': '%baz+aux'};
         await router.go('articles', {}, queryParameters: queryParams);
         expect(mockWindow.history.urlList.length, equals(1));
         expect(mockWindow.history.urlList.last,
@@ -65,7 +65,7 @@ main() {
               path: '/:foo',
               mount: (child) => child..addRoute(name: 'b', path: '/:bar'));
 
-        var routeA = router.root.findRoute('a');
+        final routeA = router.root.findRoute('a');
 
         await router.go('a.b', {});
         expect(mockWindow.history.urlList.length, equals(1));
@@ -81,7 +81,7 @@ main() {
       });
 
       test('should attempt to reverse default routes', () async {
-        var counters = <String, int>{'aEnter': 0, 'bEnter': 0};
+        final counters = <String, int>{'aEnter': 0, 'bEnter': 0};
         router.root
           ..addRoute(
               name: 'a',
@@ -100,14 +100,14 @@ main() {
         await router.route('');
         expect(counters, {'aEnter': 1, 'bEnter': 1});
 
-        var routeA = router.root.findRoute('a');
+        final routeA = router.root.findRoute('a');
         await router.go('b', {'bar': 'bbb'}, startingFrom: routeA);
         expect(mockWindow.history.urlList.length, equals(1));
         expect(mockWindow.history.urlList.last, equals('/null/bbb'));
       });
 
       test('should force reload already active routes', () async {
-        var counters = <String, int>{'aEnter': 0, 'bEnter': 0};
+        final counters = <String, int>{'aEnter': 0, 'bEnter': 0};
         router.root
           ..addRoute(
               name: 'a',
@@ -280,8 +280,8 @@ main() {
 
     group('url', () {
       test('should reconstruct url', () async {
-        var mockWindow = new MockWindow();
-        var router = new Router(
+        final mockWindow = new MockWindow();
+        final router = new Router(
             historyProvider: new BrowserHistory(windowImpl: mockWindow));
         router.root
           ..addRoute(
@@ -291,7 +291,7 @@ main() {
               mount: (child) => child
                 ..addRoute(name: 'b', defaultRoute: true, path: '/:bar'));
 
-        var routeA = router.root.findRoute('a');
+        final routeA = router.root.findRoute('a');
 
         await router.route('');
         expect(router.url('a.b'), '/null/null');
@@ -349,7 +349,7 @@ main() {
                       ..addRoute(
                           name: 'aux', path: '/aux', mount: (child) => child)));
 
-        var strPath =
+        final strPath =
             (List<Route> path) => path.map((Route r) => r.name).join('.');
 
         expect(strPath(router.activePath), '');
@@ -357,7 +357,7 @@ main() {
         await router.route('/foo');
         expect(strPath(router.activePath), 'foo');
 
-        var foo = router.findRoute('foo');
+        final foo = router.findRoute('foo');
         await router.go('bar', {}, startingFrom: foo);
         expect(strPath(router.activePath), 'foo.bar');
       });
@@ -383,7 +383,7 @@ main() {
                       ..addRoute(
                           name: 'aux', path: '/aux', mount: (child) => child)));
 
-        var strPath =
+        final strPath =
             (List<Route> path) => path.map((Route r) => r.name).join('.');
 
         expect(strPath(router.activePath), '');
@@ -391,7 +391,7 @@ main() {
         await router.route('/foo/qux/aux');
         expect(strPath(router.activePath), 'foo.qux.aux');
 
-        var foo = router.findRoute('foo');
+        final foo = router.findRoute('foo');
         await router.go('bar', {}, startingFrom: foo);
         expect(strPath(router.activePath), 'foo.bar');
       });
@@ -399,10 +399,11 @@ main() {
 
     group('listen', () {
       group('pushState', () {
-        testInit(mockWindow, [count = 1]) {
-          when(mockWindow.location.pathname).thenReturn('/hello');
-          when(mockWindow.location.search).thenReturn('?foo=bar&baz=bat');
-          var router = new Router(
+        testInit(MockWindow mockWindow, MockLocation mockLocation,
+            [count = 1]) {
+          when(mockLocation.pathname).thenReturn('/hello');
+          when(mockLocation.search).thenReturn('?foo=bar&baz=bat');
+          final router = new Router(
               historyProvider: new BrowserHistory(windowImpl: mockWindow));
           router.root.addRoute(name: 'hello', path: '/hello');
           router.onRouteStart
@@ -416,25 +417,29 @@ main() {
         }
 
         test('should route current path on listen with pop', () async {
-          var mockWindow = new MockWindow();
-          var mockPopStateController = new StreamController<Event>(sync: true);
+          final mockLocation = new MockLocation([]);
+          final mockWindow = new MockWindow(mockLocation: mockLocation);
+          final mockPopStateController =
+              new StreamController<PopStateEvent>(sync: true);
           when(mockWindow.onPopState).thenReturn(mockPopStateController.stream);
-          testInit(mockWindow, 2);
+          testInit(mockWindow, mockLocation, 2);
           mockPopStateController.add(null);
           await mockPopStateController.close();
         });
 
         test('should route current path on listen without pop', () async {
-          var mockWindow = new MockWindow();
-          var mockPopStateController = new StreamController<Event>(sync: true);
+          final mockLocation = new MockLocation([]);
+          final mockWindow = new MockWindow(mockLocation: mockLocation);
+          final mockPopStateController =
+              new StreamController<PopStateEvent>(sync: true);
           when(mockWindow.onPopState).thenReturn(mockPopStateController.stream);
-          testInit(mockWindow);
+          testInit(mockWindow, mockLocation);
           await mockPopStateController.close();
         });
 
         test('should process url changes for route rejection', () async {
-          var mockWindow = new MockWindow();
-          var router = new Router(
+          final mockWindow = new MockWindow();
+          final router = new Router(
               historyProvider: new BrowserHistory(windowImpl: mockWindow));
           router.root
             ..addRoute(
@@ -463,13 +468,13 @@ main() {
         });
 
         test('should handle route rejection on initial URL', () async {
-          var mockWindow = new MockWindow();
+          final mockWindow = new MockWindow();
           when(mockWindow.location.pathname).thenReturn('/foo');
           when(mockWindow.location.search).thenReturn('');
           when(mockWindow.location.hash).thenReturn('');
-          var router = new Router(
+          final router = new Router(
               historyProvider: new BrowserHistory(windowImpl: mockWindow));
-          var fallbackCompleter = new Completer();
+          final fallbackCompleter = new Completer();
           router.root
             ..addRoute(
                 name: 'fallback',
@@ -503,7 +508,8 @@ main() {
         setUp(() {
           mockWindow = new MockWindow();
           history = new BrowserHistory(windowImpl: mockWindow);
-          mockPopStateController = new StreamController<Event>(sync: true);
+          mockPopStateController =
+              new StreamController<PopStateEvent>(sync: true);
           when(mockWindow.onPopState).thenReturn(mockPopStateController.stream);
           router = new Router(historyProvider: history);
           router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
