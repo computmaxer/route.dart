@@ -14,7 +14,7 @@ main() {
   querySelector('#warning').remove();
 
   // set up the default router to control 1 section of the example page
-  var router = new Router(useFragment: true);
+  final router = new Router(useFragment: true);
 
   router.root
     ..addRoute(
@@ -43,7 +43,7 @@ main() {
   router.listen();
 
   // set up a second router that doesn't affect the url for a different section of the page
-  var router2 =
+  final router2 =
       new Router(useFragment: true, historyProvider: new MemoryHistory());
 
   router2.root

@@ -69,12 +69,12 @@ class UrlTemplate implements UrlMatcher {
     template = template.replaceAllMapped(_specialChars, (m) => r'\' + m[0]);
     _fields = <String>[];
     _chunks = [];
-    var exp = new RegExp(r':(\w+\*?)');
+    RegExp exp = new RegExp(r':(\w+\*?)');
     StringBuffer sb = new StringBuffer('^');
     int start = 0;
     exp.allMatches(template).forEach((Match m) {
-      var paramName = m[1];
-      var txt = template.substring(start, m.start);
+      String paramName = m[1];
+      String txt = template.substring(start, m.start);
       _fields.add(paramName);
       _chunks.add(txt);
       _chunks.add((Map params) => params[paramName]);
@@ -87,7 +87,7 @@ class UrlTemplate implements UrlMatcher {
       start = m.end;
     });
     if (start != template.length) {
-      var txt = template.substring(start, template.length);
+      String txt = template.substring(start, template.length);
       sb.write(txt);
       _chunks.add(txt);
     }
@@ -99,11 +99,11 @@ class UrlTemplate implements UrlMatcher {
     if (match == null) {
       return null;
     }
-    var parameters = new Map();
-    for (var i = 0; i < match.groupCount; i++) {
+    Map<String, String> parameters = <String, String>{};
+    for (int i = 0; i < match.groupCount; i++) {
       parameters[_fields[i]] = match[i + 1];
     }
-    var tail = url.substring(match[0].length);
+    String tail = url.substring(match[0].length);
     return new UrlMatch(match[0], tail, parameters);
   }
 
