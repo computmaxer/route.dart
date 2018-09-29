@@ -3,9 +3,10 @@ library route.providers.memory_history_test;
 import 'dart:async';
 import 'dart:html';
 
-import 'package:test/test.dart';
+import 'package:dart2_constant/core.dart' as constant;
 import 'package:route_hierarchical/client.dart';
 import 'package:route_hierarchical/history_provider.dart';
+import 'package:test/test.dart';
 
 import '../util/utils.dart';
 import 'common_tests.dart';
@@ -404,7 +405,7 @@ main() {
 
           anchor.click();
 
-          await new Future.delayed(Duration.ZERO);
+          await new Future.delayed(constant.Duration.zero);
           expect(history.pageTitle, equals('Foo'));
           expect(router.findRoute('foo').isActive, isTrue);
         });
@@ -423,7 +424,7 @@ main() {
 
           anchor.click();
 
-          await new Future.delayed(Duration.ZERO);
+          await new Future.delayed(constant.Duration.zero);
           expect(history.pageTitle, equals(''));
           expect(router.findRoute('foo').isActive, isFalse);
         });
@@ -444,7 +445,7 @@ main() {
 
           anchorChild.click();
 
-          await new Future.delayed(Duration.ZERO);
+          await new Future.delayed(constant.Duration.zero);
           expect(history.pageTitle, equals('Foo'));
           expect(router.findRoute('foo').isActive, isTrue);
         });
@@ -463,7 +464,7 @@ main() {
 
           anchor.click();
 
-          await new Future.delayed(Duration.ZERO);
+          await new Future.delayed(constant.Duration.zero);
           expect(history.pageTitle, equals('Foo'));
           expect(router.findRoute('foo').isActive, isTrue);
         });
