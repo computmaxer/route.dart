@@ -1,3 +1,4 @@
+@TestOn('browser')
 library route.providers.memory_history_test;
 
 import 'dart:async';
