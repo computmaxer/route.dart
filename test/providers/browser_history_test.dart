@@ -404,7 +404,7 @@ main() {
         testInit(MockWindow mockWindow, MockLocation mockLocation,
             [count = 1]) {
           when(mockLocation.pathname).thenReturn('/hello');
-          when(mockLocation.search).thenReturn('?foo=bar&baz=bat');
+          when(mockLocation.search).thenAnswer((i) => '?foo=bar&baz=bat');
           final router = new Router(
               historyProvider: new BrowserHistory(windowImpl: mockWindow));
           router.root.addRoute(name: 'hello', path: '/hello');
@@ -423,7 +423,8 @@ main() {
           final mockWindow = new MockWindow(mockLocation: mockLocation);
           final mockPopStateController =
               new StreamController<PopStateEvent>(sync: true);
-          when(mockWindow.onPopState).thenReturn(mockPopStateController.stream);
+          when(mockWindow.onPopState)
+              .thenAnswer((i) => mockPopStateController.stream);
           testInit(mockWindow, mockLocation, 2);
           mockPopStateController.add(null);
           await mockPopStateController.close();
@@ -434,7 +435,8 @@ main() {
           final mockWindow = new MockWindow(mockLocation: mockLocation);
           final mockPopStateController =
               new StreamController<PopStateEvent>(sync: true);
-          when(mockWindow.onPopState).thenReturn(mockPopStateController.stream);
+          when(mockWindow.onPopState)
+              .thenAnswer((i) => mockPopStateController.stream);
           testInit(mockWindow, mockLocation);
           await mockPopStateController.close();
         });
@@ -512,7 +514,8 @@ main() {
           history = new BrowserHistory(windowImpl: mockWindow);
           mockPopStateController =
               new StreamController<PopStateEvent>(sync: true);
-          when(mockWindow.onPopState).thenReturn(mockPopStateController.stream);
+          when(mockWindow.onPopState)
+              .thenAnswer((i) => mockPopStateController.stream);
           router = new Router(historyProvider: history);
           router.root.addRoute(name: 'foo', path: '/foo', pageTitle: 'Foo');
         });
