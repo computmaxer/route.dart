@@ -1,10 +1,10 @@
 name: route_hierarchical
-version: 0.10.4
+version: 1.0.0
 description: A client routing library for Dart
 authors:
   - Justin Fagnani <justinfagnani@google.com>
   - Pavel Jbanov <pavelj@google.com>
-homepage: https://github.com/Workiva/route.dart
+homepage: https://github.com/computmaxer/route.dart
 
 environment:
   sdk: '>=1.9.0 <3.0.0'
